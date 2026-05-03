@@ -8,11 +8,31 @@ const siteDescription =
 const faviconLogo = "/images/logo_small.png";
 const ogLogo = "/images/logo.png";
 
-const metadataBaseRaw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-const metadataBase =
-  metadataBaseRaw?.startsWith("http") === true
-    ? new URL(metadataBaseRaw)
-    : new URL("http://localhost:3000");
+function stripTrailingSlash(s: string) {
+  return s.replace(/\/+$/, "");
+}
+
+/** Crawlers require absolute HTTPS image URLs — avoid localhost URLs on Vercel when env omits NEXT_PUBLIC_SITE_URL. */
+function resolveMetadataBase(): URL {
+  const siteUrl = stripTrailingSlash(
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "",
+  );
+  if (siteUrl.startsWith("http")) return new URL(siteUrl);
+
+  const productionHostRaw =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim() ??
+    process.env.VERCEL_URL?.trim();
+  if (productionHostRaw) {
+    const host = stripTrailingSlash(
+      productionHostRaw.replace(/^https?:\/\//, ""),
+    );
+    return new URL(`https://${host}`);
+  }
+
+  return new URL("http://localhost:3000");
+}
+
+const metadataBase = resolveMetadataBase();
 
 export const metadata: Metadata = {
   metadataBase,
@@ -31,7 +51,13 @@ export const metadata: Metadata = {
     description: siteDescription,
     type: "website",
     locale: "en_US",
-    images: [{ url: ogLogo }],
+    siteName: "Raivis Deutschman",
+    images: [
+      {
+        url: ogLogo,
+        alt: "Raivis Deutschman — Fine Art",
+      },
+    ],
   },
   twitter: {
     card: "summary",
