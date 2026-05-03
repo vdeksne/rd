@@ -114,6 +114,8 @@ export async function PUT(req: Request) {
     }
   }
 
+  /* Homepage and nested layouts consume overrides via noStore(); still poke cache on save. */
+  revalidatePath("/");
   revalidatePath("/", "layout");
 
   return NextResponse.json({ ok: true });

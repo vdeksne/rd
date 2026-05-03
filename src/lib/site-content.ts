@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "fs";
 import path from "path";
+import { unstable_noStore as noStore } from "next/cache";
 import { cache } from "react";
 import {
   aboutContent,
@@ -33,14 +34,22 @@ function readSiteOverridesFromDisk(): SiteOverrides {
 /**
  * Loads merged site JSON. On Vercel (Blob token set), reads latest from Blob after admin Save;
  * otherwise uses committed `data/site-overrides.json`.
+ *
+ * Calls `noStore()` so routes are not static-baked at build time (otherwise the homepage stays
+ * on defaults until ISR/revalidation, which feels broken after admin Save).
  */
-export const loadSiteOverrides = cache(async (): Promise<SiteOverrides> => {
+const loadSiteOverridesCached = cache(async (): Promise<SiteOverrides> => {
   const fromBlob = await fetchSiteOverridesFromBlob();
   if (fromBlob !== null) {
     return fromBlob;
   }
   return readSiteOverridesFromDisk();
 });
+
+export async function loadSiteOverrides(): Promise<SiteOverrides> {
+  noStore();
+  return loadSiteOverridesCached();
+}
 
 export async function getMergedPrimaryNav(): Promise<{ href: string; label: string }[]> {
   const o = await loadSiteOverrides();
