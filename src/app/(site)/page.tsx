@@ -32,9 +32,10 @@ export default function HomePage() {
               src={homeHero.imageSrc}
               alt=""
               fill
-              priority
-              className="object-cover object-center"
               sizes={heroSizes}
+              className="object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
         </div>

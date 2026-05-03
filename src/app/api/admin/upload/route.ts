@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { randomBytes } from "crypto";
+import path from "path";
+import { put } from "@vercel/blob";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
@@ -57,21 +58,50 @@ export async function POST(req: Request): Promise<Response> {
 
   if (file.size > MAX_BYTES) {
     return NextResponse.json(
-      { error: `File too large (max ${Math.round(MAX_BYTES / (1024 * 1024))} MB)` },
+      {
+        error: `File too large (max ${Math.round(MAX_BYTES / (1024 * 1024))} MB)`,
+      },
       { status: 400 },
     );
   }
 
   const buf = Buffer.from(await file.arrayBuffer());
+  const base = `admin/${Date.now()}-${randomBytes(8).toString("hex")}${ext}`;
 
-  const base = `${Date.now()}-${randomBytes(8).toString("hex")}${ext}`;
-  const relativeDir = path.join("public", "images", "admin-uploads");
-  const diskDir = path.join(process.cwd(), relativeDir);
-  const diskPath = path.join(diskDir, base);
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const blob = await put(base, buf, {
+        access: "public",
+        contentType: mime,
+      });
+      return NextResponse.json({ url: blob.url });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Blob upload failed";
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
+  }
 
-  await mkdir(diskDir, { recursive: true });
-  await writeFile(diskPath, buf);
-
-  const publicUrl = `/images/admin-uploads/${base}`;
-  return NextResponse.json({ url: publicUrl });
+  try {
+    const relativeDir = path.join("public", "images", "admin-uploads");
+    const diskDir = path.join(process.cwd(), relativeDir);
+    const diskName = `${Date.now()}-${randomBytes(8).toString("hex")}${ext}`;
+    const diskPath = path.join(diskDir, diskName);
+    await mkdir(diskDir, { recursive: true });
+    await writeFile(diskPath, buf);
+    return NextResponse.json({ url: `/images/admin-uploads/${diskName}` });
+  } catch (e) {
+    const code =
+      e && typeof e === "object" && "code" in e ? String((e as NodeJS.ErrnoException).code) : "";
+    const isRoFs = code === "EROFS" || code === "ENOTSUP" || code === "EACCES";
+    return NextResponse.json(
+      {
+        error: isRoFs
+          ? "This host has a read-only filesystem. In Vercel → Storage, create a Blob store and link it (sets BLOB_READ_WRITE_TOKEN), then redeploy."
+          : e instanceof Error
+            ? e.message
+            : "Could not save file",
+      },
+      { status: 500 },
+    );
+  }
 }

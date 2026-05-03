@@ -69,6 +69,11 @@ function imageRemotePatterns(): NonNullable<NextConfig["images"]>["remotePattern
       pathname: "/**",
     },
     {
+      protocol: "https",
+      hostname: "*.public.blob.vercel-storage.com",
+      pathname: "/**",
+    },
+    {
       protocol: "http",
       hostname: "localhost",
       pathname: "/**",

@@ -57,7 +57,10 @@ export function AdminImageUrlField({
             typeof data.error === "string" ? data.error : `Upload failed (${res.status})`,
           );
         }
-        if (typeof data.url !== "string" || !data.url.startsWith("/")) {
+        if (
+          typeof data.url !== "string" ||
+          (!data.url.startsWith("/") && !data.url.startsWith("https://"))
+        ) {
           throw new Error("Invalid upload response");
         }
         onChange(data.url);

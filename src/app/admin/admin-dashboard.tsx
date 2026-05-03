@@ -165,9 +165,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
             Site admin
           </h1>
           <p className="mt-1 text-xs font-light text-neutral-600">
-            Edit navigation, hero, portfolio, curate, and about. Each image field
-            has an Upload button (files go to /images/admin-uploads/ on this
-            server); you can still paste external URLs.
+            Edit navigation, hero, portfolio, curate, and about. Uploaded files use
+            Vercel Blob when <code className="rounded bg-neutral-100 px-1">BLOB_READ_WRITE_TOKEN</code>{" "}
+            is set (production); otherwise they save under{" "}
+            <code className="rounded bg-neutral-100 px-1">public/images/admin-uploads/</code>{" "}
+            locally. You can always paste an external image URL.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
