@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local admin uploads (keep directory with .gitkeep)
+public/images/admin-uploads/*
+!public/images/admin-uploads/.gitkeep
+
+*storybook.log
+storybook-static
