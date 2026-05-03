@@ -8,6 +8,10 @@ import {
   verifyAdminSessionValue,
 } from "@/lib/admin-session";
 import { getSiteEditorDefaults } from "@/lib/site-editor-defaults";
+import {
+  fetchSiteOverridesFromBlob,
+  saveSiteOverridesToBlob,
+} from "@/lib/site-overrides-blob";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
 export const runtime = "nodejs";
@@ -41,8 +45,11 @@ export async function GET() {
   const denied = await requireAdmin();
   if (denied) return denied;
 
+  const fromBlob = await fetchSiteOverridesFromBlob();
+  const overrides = fromBlob !== null ? fromBlob : readOverridesDisk();
+
   return NextResponse.json({
-    overrides: readOverridesDisk(),
+    overrides,
     defaults: getSiteEditorDefaults(),
   });
 }
@@ -70,14 +77,42 @@ export async function PUT(req: Request) {
     );
   }
 
-  const dir = path.join(process.cwd(), "data");
-  mkdirSync(dir, { recursive: true });
-  const filePath = path.join(dir, "site-overrides.json");
-  writeFileSync(
-    filePath,
-    `${JSON.stringify(next as SiteOverrides, null, 2)}\n`,
-    "utf-8",
-  );
+  const payload = next as SiteOverrides;
+  const json = `${JSON.stringify(payload, null, 2)}\n`;
+
+  if (process.env.BLOB_READ_WRITE_TOKEN?.trim()) {
+    try {
+      await saveSiteOverridesToBlob(payload);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Blob write failed";
+      console.error("[admin/overrides] blob", e);
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
+  } else {
+    try {
+      const dir = path.join(process.cwd(), "data");
+      mkdirSync(dir, { recursive: true });
+      const filePath = path.join(dir, "site-overrides.json");
+      writeFileSync(filePath, json, "utf-8");
+    } catch (e) {
+      const code =
+        e && typeof e === "object" && "code" in e
+          ? String((e as NodeJS.ErrnoException).code)
+          : "";
+      const isRoFs = code === "EROFS" || code === "ENOTSUP" || code === "EACCES";
+      console.error("[admin/overrides] disk", e);
+      return NextResponse.json(
+        {
+          error: isRoFs
+            ? "Read-only filesystem: set BLOB_READ_WRITE_TOKEN (Vercel Blob) to save from production."
+            : e instanceof Error
+              ? e.message
+              : "Could not write overrides",
+        },
+        { status: 500 },
+      );
+    }
+  }
 
   revalidatePath("/", "layout");
 

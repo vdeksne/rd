@@ -7,9 +7,9 @@ import { getMergedHomeHero, getMergedHomeHeroFrame } from "@/lib/site-content";
 const heroSizes =
   "(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc(100vw - 48px), calc(100vw - var(--site-rail) - 80px)";
 
-export default function HomePage() {
-  const homeHero = getMergedHomeHero();
-  const homeHeroFrame = getMergedHomeHeroFrame();
+export default async function HomePage() {
+  const homeHero = await getMergedHomeHero();
+  const homeHeroFrame = await getMergedHomeHeroFrame();
   const { widthPx, heightPx } = homeHeroFrame;
 
   return (

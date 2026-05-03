@@ -8,8 +8,8 @@ export default async function SiteLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const navItems = getMergedPrimaryNav();
-  const artworks = getMergedArtworks();
+  const navItems = await getMergedPrimaryNav();
+  const artworks = await getMergedArtworks();
 
   return (
     <CartProvider artworks={artworks}>

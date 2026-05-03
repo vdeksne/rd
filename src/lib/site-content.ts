@@ -12,9 +12,10 @@ import {
   type PortfolioSlide,
 } from "@/lib/demo-content";
 import { SITE_PRIMARY_NAV } from "@/lib/site-nav";
+import { fetchSiteOverridesFromBlob } from "@/lib/site-overrides-blob";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
-export const loadSiteOverrides = cache((): SiteOverrides => {
+function readSiteOverridesFromDisk(): SiteOverrides {
   try {
     const filePath = path.join(process.cwd(), "data", "site-overrides.json");
     if (!existsSync(filePath)) return {};
@@ -27,49 +28,69 @@ export const loadSiteOverrides = cache((): SiteOverrides => {
   } catch {
     return {};
   }
+}
+
+/**
+ * Loads merged site JSON. On Vercel (Blob token set), reads latest from Blob after admin Save;
+ * otherwise uses committed `data/site-overrides.json`.
+ */
+export const loadSiteOverrides = cache(async (): Promise<SiteOverrides> => {
+  const fromBlob = await fetchSiteOverridesFromBlob();
+  if (fromBlob !== null) {
+    return fromBlob;
+  }
+  return readSiteOverridesFromDisk();
 });
 
-export function getMergedPrimaryNav(): { href: string; label: string }[] {
-  const items = loadSiteOverrides().nav?.items;
+export async function getMergedPrimaryNav(): Promise<{ href: string; label: string }[]> {
+  const o = await loadSiteOverrides();
+  const items = o.nav?.items;
   if (items?.length) return items.map((i) => ({ href: i.href, label: i.label }));
   return SITE_PRIMARY_NAV.map((i) => ({ href: i.href, label: i.label }));
 }
 
-export function getMergedHomeHero() {
-  return { ...homeHero, ...loadSiteOverrides().homeHero };
+export async function getMergedHomeHero() {
+  const o = await loadSiteOverrides();
+  return { ...homeHero, ...o.homeHero };
 }
 
-export function getMergedHomeHeroFrame() {
-  return { ...homeHeroFrame, ...loadSiteOverrides().homeHeroFrame };
+export async function getMergedHomeHeroFrame() {
+  const o = await loadSiteOverrides();
+  return { ...homeHeroFrame, ...o.homeHeroFrame };
 }
 
-export function getMergedPortfolioSlides(): PortfolioSlide[] {
-  const next = loadSiteOverrides().portfolioSlides;
+export async function getMergedPortfolioSlides(): Promise<PortfolioSlide[]> {
+  const o = await loadSiteOverrides();
+  const next = o.portfolioSlides;
   if (next?.length) return next;
   return portfolioSlides;
 }
 
-export function getMergedPortfolioDefaultSlideIndex(): number {
-  const v = loadSiteOverrides().portfolioDefaultSlideIndex;
+export async function getMergedPortfolioDefaultSlideIndex(): Promise<number> {
+  const o = await loadSiteOverrides();
+  const v = o.portfolioDefaultSlideIndex;
   if (typeof v === "number" && Number.isFinite(v)) return v;
   return portfolioDefaultSlideIndex;
 }
 
-export function getMergedArtworks(): Artwork[] {
-  const next = loadSiteOverrides().artworks;
+export async function getMergedArtworks(): Promise<Artwork[]> {
+  const o = await loadSiteOverrides();
+  const next = o.artworks;
   if (next?.length) return next;
   return demoArtworks;
 }
 
-export function getMergedArtwork(slug: string): Artwork | null {
-  return getMergedArtworks().find((a) => a.slug === slug) ?? null;
+export async function getMergedArtwork(slug: string): Promise<Artwork | null> {
+  const list = await getMergedArtworks();
+  return list.find((a) => a.slug === slug) ?? null;
 }
 
-export function getMergedAboutContent() {
-  const o = loadSiteOverrides().aboutContent;
-  if (!o) return aboutContent;
+export async function getMergedAboutContent() {
+  const o = await loadSiteOverrides();
+  const merged = o.aboutContent;
+  if (!merged) return aboutContent;
   return {
-    imageSrc: o.imageSrc ?? aboutContent.imageSrc,
-    sections: o.sections ?? aboutContent.sections,
+    imageSrc: merged.imageSrc ?? aboutContent.imageSrc,
+    sections: merged.sections ?? aboutContent.sections,
   };
 }

@@ -6,8 +6,8 @@ import { getMergedAboutContent } from "@/lib/site-content";
  * Neue Haas Grotesk Display Pro 75 Bold labels, 45 Light body @ 12px / 1px tracking;
  * exhibitions list @ 30px line-height.
  */
-export default function AboutPage() {
-  const aboutContent = getMergedAboutContent();
+export default async function AboutPage() {
+  const aboutContent = await getMergedAboutContent();
   return (
     <main className="relative min-h-screen bg-white pb-24 max-lg:pt-0 lg:pt-[116px]">
       <div className="mx-auto flex w-full max-w-[1226px] flex-col-reverse gap-8 px-6 lg:flex-row lg:items-start lg:justify-between lg:gap-[43px]">

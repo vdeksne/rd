@@ -4,8 +4,8 @@ import { getSiteEditorDefaults } from "@/lib/site-editor-defaults";
 
 export const metadata = { title: "Admin — Raivis Deutschman", robots: "noindex" };
 
-export default function AdminHomePage() {
-  const overrides = loadSiteOverrides();
+export default async function AdminHomePage() {
+  const overrides = await loadSiteOverrides();
   const defaults = getSiteEditorDefaults();
 
   return (

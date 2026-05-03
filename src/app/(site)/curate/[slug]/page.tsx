@@ -8,14 +8,14 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const art = getMergedArtwork(slug);
+  const art = await getMergedArtwork(slug);
   if (!art) return { title: "Work" };
   return { title: art.title };
 }
 
 export default async function CurateDetailPage({ params }: Props) {
   const { slug } = await params;
-  const art = getMergedArtwork(slug);
+  const art = await getMergedArtwork(slug);
   if (!art) notFound();
 
   const fmt = (n: number) =>

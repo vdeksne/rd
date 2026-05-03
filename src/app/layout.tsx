@@ -56,12 +56,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { topPaddingDesktopPx } = getMergedHomeHeroFrame();
+  const { topPaddingDesktopPx } = await getMergedHomeHeroFrame();
   const htmlStyle = {
     "--home-hero-top": `${topPaddingDesktopPx}px`,
   } as CSSProperties;

@@ -4,9 +4,9 @@ import {
 } from "@/lib/site-content";
 import { PortfolioGallery } from "./portfolio-gallery";
 
-export default function PortfolioPage() {
-  const portfolioSlides = getMergedPortfolioSlides();
-  const portfolioDefaultSlideIndex = getMergedPortfolioDefaultSlideIndex();
+export default async function PortfolioPage() {
+  const portfolioSlides = await getMergedPortfolioSlides();
+  const portfolioDefaultSlideIndex = await getMergedPortfolioDefaultSlideIndex();
 
   return (
     <main className="bg-white pb-24 max-lg:pt-0 lg:pt-[116px]">

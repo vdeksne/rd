@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { getMergedArtworks } from "@/lib/site-content";
 
-export default function CuratePage() {
-  const demoArtworks = getMergedArtworks();
+export default async function CuratePage() {
+  const demoArtworks = await getMergedArtworks();
   return (
     <main className="bg-white pb-24 max-lg:pt-0 lg:pt-[114px]">
       <div className="mx-auto max-w-[1558px] px-6 sm:px-[max(1rem,3vw)]">
