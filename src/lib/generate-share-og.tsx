@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
-export const OG_ALT = "Raivis Deutschman — Fine Art";
+export const OG_ALT = "Raivis Deutschman - Fine Art";
 
 /**
  * WhatsApp/Telegram require link-preview images roughly ≥300×200px; favicon-sized logos are ignored.
@@ -26,12 +26,7 @@ export async function generateShareOgImage(): Promise<ImageResponse> {
           background: "#0f1a14",
         }}
       >
-        <img
-          alt=""
-          src={src}
-          width={630}
-          height={252}
-        />
+        <img alt="" src={src} width={630} height={252} />
       </div>
     ),
     { ...OG_SIZE },
