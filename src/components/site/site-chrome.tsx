@@ -16,10 +16,10 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
 
       <aside
         className={cn(
-          "pointer-events-none fixed inset-y-0 left-0 z-20 hidden w-[min(100%,var(--site-rail))] lg:block",
+          "pointer-events-none fixed inset-y-0 left-0 z-20 hidden min-h-0 w-[min(100%,var(--site-rail))] lg:flex lg:min-h-svh lg:flex-col",
         )}
       >
-        <div className="pointer-events-auto flex min-w-0 max-w-full flex-col px-[max(1rem,3.3vw)] pt-[clamp(2rem,5vw,58px)] pb-8 lg:px-6">
+        <div className="pointer-events-auto flex min-h-0 min-w-0 max-w-full flex-1 flex-col px-[max(1rem,3.3vw)] pt-[clamp(2rem,5vw,58px)] pb-8 lg:px-6">
           <Link
             href="/"
             className={cn(
@@ -54,7 +54,8 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
         href="/cart"
         className={cn(
           "fixed right-[max(1rem,2.4vw)] top-[max(1rem,3.9vh)] z-30 hidden text-black lg:flex",
-          "h-10 min-w-10 items-center justify-center rounded-full border border-transparent transition-colors hover:border-black/10",
+          "h-10 min-w-10 items-center justify-center rounded-full border border-transparent bg-white shadow-none",
+          "transition-colors hover:border-black/10",
         )}
         aria-label="Shopping cart"
       >
@@ -63,7 +64,9 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
 
       <div
         className={cn(
-          "relative z-0 flex min-h-screen flex-col pl-0 lg:pl-[var(--site-rail)]",
+          /* No z-index here: fixed overlays inside children (e.g. curate lightbox) must not be
+           * trapped below chrome (cart z-30, mobile header z-40). */
+          "relative flex min-h-screen flex-col pl-0 lg:pl-[var(--site-rail)]",
           "max-lg:pt-[calc(env(safe-area-inset-top,0px)+3.75rem)] lg:pt-0",
         )}
       >

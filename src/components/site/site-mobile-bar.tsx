@@ -54,7 +54,7 @@ export function SiteMobileBar({ nav }: Props) {
             href="/cart"
             className={cn(
               "flex h-11 min-w-11 touch-manipulation items-center justify-center rounded-full",
-              "border border-transparent text-black transition-colors",
+              "border border-transparent bg-white shadow-none text-black transition-colors",
               "hover:border-black/10 active:bg-black/[0.03]",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/40",
             )}

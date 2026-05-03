@@ -293,10 +293,10 @@ export function PortfolioGallery({
                 )}
               >
                 <Image
-                  src={portfolioSlideSrc(slide, 448)}
+                  src={portfolioSlideSrc(slide, 512)}
                   alt=""
                   fill
-                  className="object-cover"
+                  className="object-cover object-center scale-[1.18]"
                   sizes="148px"
                 />
               </button>

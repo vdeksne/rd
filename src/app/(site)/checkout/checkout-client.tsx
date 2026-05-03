@@ -274,8 +274,15 @@ export function CheckoutClient() {
             More payment options
           </Button>
           <p className="text-center text-[10px] leading-relaxed text-[#999]">
-            Next step uses Stripe Checkout — wallets and local methods (Klarna,
-            PayPal, etc.) depend on your Stripe Dashboard and customer region.
+            After paying, Stripe should return you automatically to our thank-you
+            page. If you remain on Stripe with only a green checkmark, scroll the
+            page for a confirmation link or try a window without extensions (ad
+            blockers / strict CSP can block the redirect). Next step uses Stripe
+            Checkout — wallets and local methods (Klarna, PayPal, etc.) depend on
+            your Stripe Dashboard and customer region. If the page hangs or
+            DevTools shows <code className="text-[9px]">r.stripe.com</code>{" "}
+            <code className="text-[9px]">ERR_BLOCKED_BY_CLIENT</code>, allow Stripe
+            in your ad blocker or try a private window without extensions.
           </p>
         </div>
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { publicSiteOriginFromRequest } from "@/lib/public-site-url";
 import { getStripe } from "@/lib/stripe";
 
 type LineItemBody = {
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = publicSiteOriginFromRequest(req);
 
   try {
     const body = (await req.json()) as {

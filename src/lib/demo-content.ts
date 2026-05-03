@@ -309,7 +309,7 @@ export function getArtwork(slug: string) {
 }
 
 export const homeHero = {
-  imageSrc: mockCatalogImage(2),
+  imageSrc: mockCatalogImage(29),
   captionBefore: "Polaroid of Mike Brodie shot by Paul Schiek, from the series: ",
   captionLinkText: "Tones of Dirt and Bone",
   captionLinkHref: "https://www.mike-brodie.com/tones-of-dirt-and-bone",

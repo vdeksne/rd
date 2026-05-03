@@ -16,7 +16,7 @@
     ]
   },
   "homeHero": {
-    "imageSrc": "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1600&q=80",
+    "imageSrc": "/images/mock/rd-catalog-29.jpeg",
     "captionBefore": "Polaroid of Mike Brodie shot by Paul Schiek, from the series: ",
     "captionLinkText": "Tones of Dirt and Bone",
     "captionLinkHref": "https://www.mike-brodie.com/tones-of-dirt-and-bone",

@@ -1,6 +1,6 @@
 # Raivis Deutschman — Fine Art Commerce
 
-Editorial e-commerce front end for limited-edition works: **Next.js 16 (App Router)**, **Tailwind CSS 4**, **shadcn/ui**, **Storybook**, **Supabase** (client helpers), and **Stripe** (checkout session API skeleton). UI routes mirror the linked Figma frames (home, portfolio / “Residue”, curate grid & detail, cart, checkout summary, about).
+Editorial e-commerce front end for limited-edition works: **Next.js 16 (App Router)**, **Tailwind CSS 4**, **shadcn/ui**, **Storybook**, **Supabase** (client helpers), and **Stripe** (hosted Checkout session + webhook scaffold). UI routes mirror the linked Figma frames (home, portfolio / “Residue”, curate grid & detail, cart, checkout summary, about).
 
 ## Scripts
 
@@ -16,6 +16,24 @@ npm run storybook  # Component workshop
 
 Copy `.env.example` to `.env.local` and fill values from the Supabase and Stripe dashboards. `getSupabaseBrowser()` returns `null` until `NEXT_PUBLIC_SUPABASE_*` are set, so the storefront still runs for local UI work.
 
+### Stripe (Checkout)
+
+1. [Dashboard → API keys](https://dashboard.stripe.com/apikeys) (Test mode): set **`STRIPE_SECRET_KEY`** (`sk_test_…`). Optional **`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`** for future client-side Stripe (hosted Checkout works without it).
+2. Set **`NEXT_PUBLIC_SITE_URL`** to the exact URL you open in the browser (e.g. `http://localhost:3000` locally, production `https://…`). Success/cancel URLs for Checkout are derived from this.
+3. **Webhooks** (recommended for real orders): [Webhooks](https://dashboard.stripe.com/webhooks) → add endpoint **`https://your-domain.com/api/webhooks/stripe`** and subscribe to **`checkout.session.completed`**. Copy the signing secret into **`STRIPE_WEBHOOK_SECRET`**.  
+   **Local CLI:** [`stripe login`](https://stripe.com/docs/stripe-cli), then:
+
+   ```bash
+   stripe listen --forward-to localhost:3000/api/webhooks/stripe
+   ```
+
+   Use the CLI’s `whsec_…` secret as **`STRIPE_WEBHOOK_SECRET`** while testing.
+4. Flow: **`/cart` → `/checkout` → Continue to payment** → Stripe-hosted Checkout → **`/checkout/success`**. Inspect events in Stripe Dashboard → Developers → Events.
+
+Enable wallets/Link/regional methods under [Payment methods](https://dashboard.stripe.com/settings/payment_methods).
+
+**Checkout: `POST https://r.stripe.com/b` → `net::ERR_BLOCKED_BY_CLIENT`?** That’s almost always an **ad blocker or privacy extension** (uBlock, Brave Shields, etc.) blocking Stripe—not a bad API key. Chrome’s “blocked by client” means the browser extension stopped the request. **Allow** Stripe domains (`stripe.com`, `checkout.stripe.com`, `r.stripe.com`) for your site, or use **incognito without extensions** while testing. Payments may still work; blocking can break Link, Radar, or some wallets.
+
 ## Routes
 
 | Path | Figma reference |
@@ -25,7 +43,7 @@ Copy `.env.example` to `.env.local` and fill values from the Supabase and Stripe
 | `/curate` | Grid |
 | `/curate/[slug]` | Edition detail + “Inquire / add to cart” |
 | `/cart` | Cart |
-| `/checkout` | Order summary + Stripe placeholder |
+| `/checkout` | Order summary + Stripe Checkout redirect |
 | `/about` | Myth / about |
 
 Demo imagery uses Unsplash via `next/image` remote patterns. Replace URLs in `src/lib/demo-content.ts` with exports from your Figma asset pipeline or Supabase Storage.
