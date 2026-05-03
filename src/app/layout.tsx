@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     template: "%s — Raivis Deutschman",
   },
   description: siteDescription,
-  // Icons: `src/app/icon.png` + `apple-icon.png` (replaces Next.js default triangle favicon)
+  // Icons: `src/app/icon.svg` + `apple-icon.svg` from `public/images/logo.svg`
   openGraph: {
     title: "Raivis Deutschman - Fine Art",
     description: siteDescription,

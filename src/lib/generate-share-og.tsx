@@ -3,16 +3,21 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
-export const OG_ALT = "Raivis Deutschman - Fine Art";
+export const OG_ALT = "Raivis Deutschman — Fine Art";
+
+const W_H = 75 / 30;
 
 /**
- * WhatsApp/Telegram require link-preview images roughly ≥300×200px; favicon-sized logos are ignored.
- * This route composes logo.png onto a full OG canvas (~1200×630).
+ * WhatsApp/Telegram need large preview images (~1200×630). We rasterise `logo.svg`
+ * via `next/og` (Satori) onto a canvas.
  */
 export async function generateShareOgImage(): Promise<ImageResponse> {
-  const logoPath = join(process.cwd(), "public", "images", "logo.png");
-  const buf = await readFile(logoPath);
-  const src = `data:image/png;base64,${buf.toString("base64")}`;
+  const logoPath = join(process.cwd(), "public", "images", "logo.svg");
+  const svg = await readFile(logoPath, "utf8");
+  const src = `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`;
+
+  const logoH = 240;
+  const logoW = Math.round(logoH * W_H);
 
   return new ImageResponse(
     (
@@ -23,10 +28,11 @@ export async function generateShareOgImage(): Promise<ImageResponse> {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0f1a14",
+          background: "#ffffff",
         }}
       >
-        <img alt="" src={src} width={630} height={252} />
+        {/* eslint-disable-next-line @next/next/no-img-element -- Satori / next/og */}
+        <img alt="" src={src} width={logoW} height={logoH} />
       </div>
     ),
     { ...OG_SIZE },

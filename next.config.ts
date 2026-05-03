@@ -52,6 +52,59 @@ function contentSecurityPolicy(): string {
 
 const enableCsp = process.env.ENABLE_SITE_CSP === "1";
 
+/**
+ * `next/image` treats absolute URLs (e.g. https://your-site.vercel.app/images/…)
+ * as remote — those hostnames must be allowed or Vercel returns 400 INVALID_IMAGE_OPTIMIZE_REQUEST.
+ */
+function imageRemotePatterns(): NonNullable<NextConfig["images"]>["remotePatterns"] {
+  const patterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
+    {
+      protocol: "https",
+      hostname: "images.unsplash.com",
+      pathname: "/**",
+    },
+    {
+      protocol: "https",
+      hostname: "*.vercel.app",
+      pathname: "/**",
+    },
+    {
+      protocol: "http",
+      hostname: "localhost",
+      pathname: "/**",
+    },
+  ];
+
+  const addHost = (raw: string | undefined) => {
+    if (!raw?.trim()) return;
+    let host = raw.trim().replace(/^https?:\/\//, "").split("/")[0];
+    host = host?.split(":")[0];
+    if (!host) return;
+    const protocol =
+      host === "localhost" || host === "127.0.0.1" ? "http" : "https";
+    if (
+      patterns.some((p) => "hostname" in p && p.hostname === host &&
+        p.protocol === protocol))
+    {
+      return;
+    }
+    patterns.push({ protocol: protocol as "http" | "https", hostname: host, pathname: "/**" });
+  };
+
+  addHost(process.env.VERCEL_URL);
+  addHost(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (siteUrl?.startsWith("http")) {
+    try {
+      addHost(new URL(siteUrl).hostname);
+    } catch {
+      /* ignore invalid URL */
+    }
+  }
+
+  return patterns;
+}
+
 const nextConfig: NextConfig = {
   // Turbopack: lock project root when parent lockfiles confuse discovery.
   // Note: Tailwind `@import "tailwindcss"` in dev is resolved via webpack (--webpack); see npm "dev" script.
@@ -70,13 +123,9 @@ const nextConfig: NextConfig = {
     return config;
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        pathname: "/**",
-      },
-    ],
+    remotePatterns: imageRemotePatterns(),
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   ...(enableCsp
     ? {
