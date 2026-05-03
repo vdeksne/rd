@@ -70,10 +70,23 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
           "max-lg:pt-[calc(env(safe-area-inset-top,0px)+3.75rem)] lg:pt-0",
         )}
       >
-        <div className="flex-1">{children}</div>
-        <p className="type-display-copyright px-6 pb-8 sm:hidden">
+        {/*
+          Mobile: generous bottom inset (same intent as cart `pb-32`) so scrolling content clears
+          the © bar and home-indicator; avoid perceived overlap where the footer reads “on top”
+          of the last paragraph. Safe area stacks with 8rem.
+        */}
+        <div className="flex min-h-0 flex-1 flex-col max-lg:pb-[calc(8rem+env(safe-area-inset-bottom,0px))]">
+          {children}
+        </div>
+        <footer
+          className={cn(
+            "type-display-copyright shrink-0 bg-white px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:hidden",
+            "max-lg:border-t max-lg:border-neutral-100",
+          )}
+          aria-label="Site"
+        >
           © RAIVIS DEUTSCHMAN
-        </p>
+        </footer>
       </div>
     </div>
   );
