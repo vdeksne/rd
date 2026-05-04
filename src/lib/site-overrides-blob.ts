@@ -4,8 +4,20 @@ import type { SiteOverrides } from "@/lib/site-overrides-types";
 /** Stable pathname in Blob for full site-overrides payload (matches JSON on disk locally). */
 export const SITE_OVERRIDES_BLOB_PATH = "site/site-overrides.json";
 
+export function getBlobReadWriteToken(): string | undefined {
+  let t = process.env.BLOB_READ_WRITE_TOKEN?.trim() ?? "";
+  /* Env UI / .env sometimes stores quoted secrets */
+  if (
+    (t.startsWith('"') && t.endsWith('"')) ||
+    (t.startsWith("'") && t.endsWith("'"))
+  ) {
+    t = t.slice(1, -1).trim();
+  }
+  return t || undefined;
+}
+
 function blobToken(): string | undefined {
-  return process.env.BLOB_READ_WRITE_TOKEN?.trim() || undefined;
+  return getBlobReadWriteToken();
 }
 
 /** Production / Blob-linked deployments: overrides come from Blob, not `data/site-overrides.json`. */
@@ -43,9 +55,9 @@ export async function readSiteOverridesFromBlobIfConfigured(): Promise<SiteOverr
   if (!token) return null;
 
   try {
+    /* Default CDN fetch — useCache:false adds ?cache=0 which can 400 on public blobs in some cases */
     const result = await get(SITE_OVERRIDES_BLOB_PATH, {
       access: "public",
-      useCache: false,
       token,
     });
 

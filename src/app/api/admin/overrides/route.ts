@@ -8,7 +8,10 @@ import {
   verifyAdminSessionValue,
 } from "@/lib/admin-session";
 import { getSiteEditorDefaults } from "@/lib/site-editor-defaults";
-import { saveSiteOverridesToBlob } from "@/lib/site-overrides-blob";
+import {
+  isBlobOverridesConfigured,
+  saveSiteOverridesToBlob,
+} from "@/lib/site-overrides-blob";
 import { resolveSiteOverrides } from "@/lib/site-content";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
@@ -62,7 +65,7 @@ export async function PUT(req: Request) {
   const payload = next as SiteOverrides;
   const json = `${JSON.stringify(payload, null, 2)}\n`;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN?.trim()) {
+  if (isBlobOverridesConfigured()) {
     try {
       await saveSiteOverridesToBlob(payload);
     } catch (e) {

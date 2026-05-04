@@ -8,6 +8,7 @@ import {
   ADMIN_SESSION_COOKIE,
   verifyAdminSessionValue,
 } from "@/lib/admin-session";
+import { getBlobReadWriteToken } from "@/lib/site-overrides-blob";
 
 export const runtime = "nodejs";
 
@@ -68,11 +69,13 @@ export async function POST(req: Request): Promise<Response> {
   const buf = Buffer.from(await file.arrayBuffer());
   const base = `admin/${Date.now()}-${randomBytes(8).toString("hex")}${ext}`;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  const blobToken = getBlobReadWriteToken();
+  if (blobToken) {
     try {
       const blob = await put(base, buf, {
         access: "public",
         contentType: mime,
+        token: blobToken,
       });
       return NextResponse.json({ url: blob.url });
     } catch (e) {
