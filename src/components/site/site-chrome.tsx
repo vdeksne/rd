@@ -67,7 +67,8 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
           /* No z-index here: fixed overlays inside children (e.g. curate lightbox) must not be
            * trapped below chrome (cart z-30, mobile header z-40). */
           "relative flex min-h-screen flex-col pl-0 lg:pl-[var(--site-rail)]",
-          "max-lg:pt-[calc(env(safe-area-inset-top,0px)+3.75rem)] lg:pt-0",
+          /* Clear fixed mobile header: match its pt (max(12px, safe)) + row (h-11) + pb-3. */
+          "max-lg:pt-[calc(max(0.75rem,env(safe-area-inset-top,0px))+3.75rem)] lg:pt-0",
         )}
       >
         {/*

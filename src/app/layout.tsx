@@ -32,6 +32,9 @@ function resolveMetadataBase(): URL {
 
 const metadataBase = resolveMetadataBase();
 
+/** Root reads hero frame CSS vars from Blob/overrides — must stay dynamic when Blob-linked. */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   metadataBase,
   title: {

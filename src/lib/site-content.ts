@@ -1,7 +1,6 @@
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { unstable_noStore as noStore } from "next/cache";
-import { cache } from "react";
 import {
   aboutContent,
   demoArtworks,
@@ -13,7 +12,7 @@ import {
   type PortfolioSlide,
 } from "@/lib/demo-content";
 import { SITE_PRIMARY_NAV } from "@/lib/site-nav";
-import { fetchSiteOverridesFromBlob } from "@/lib/site-overrides-blob";
+import { readSiteOverridesFromBlobIfConfigured } from "@/lib/site-overrides-blob";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
 function readSiteOverridesFromDisk(): SiteOverrides {
@@ -32,23 +31,23 @@ function readSiteOverridesFromDisk(): SiteOverrides {
 }
 
 /**
- * Loads merged site JSON. On Vercel (Blob token set), reads latest from Blob after admin Save;
- * otherwise uses committed `data/site-overrides.json`.
- *
- * Calls `noStore()` so routes are not static-baked at build time (otherwise the homepage stays
- * on defaults until ISR/revalidation, which feels broken after admin Save).
+ * Resolves overrides: Blob (`BLOB_READ_WRITE_TOKEN`), else `data/site-overrides.json`.
+ * When Blob is configured, repo JSON on disk must **not** override Blob (fixes “admin saved but site unchanged”).
  */
-const loadSiteOverridesCached = cache(async (): Promise<SiteOverrides> => {
-  const fromBlob = await fetchSiteOverridesFromBlob();
+export async function resolveSiteOverrides(): Promise<SiteOverrides> {
+  const fromBlob = await readSiteOverridesFromBlobIfConfigured();
   if (fromBlob !== null) {
     return fromBlob;
   }
   return readSiteOverridesFromDisk();
-});
+}
 
+/**
+ * Same as {@link resolveSiteOverrides} plus `noStore()` for App Router renders.
+ */
 export async function loadSiteOverrides(): Promise<SiteOverrides> {
   noStore();
-  return loadSiteOverridesCached();
+  return resolveSiteOverrides();
 }
 
 export async function getMergedPrimaryNav(): Promise<{ href: string; label: string }[]> {

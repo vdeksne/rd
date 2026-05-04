@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { mkdirSync, writeFileSync } from "fs";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
@@ -8,10 +8,8 @@ import {
   verifyAdminSessionValue,
 } from "@/lib/admin-session";
 import { getSiteEditorDefaults } from "@/lib/site-editor-defaults";
-import {
-  fetchSiteOverridesFromBlob,
-  saveSiteOverridesToBlob,
-} from "@/lib/site-overrides-blob";
+import { saveSiteOverridesToBlob } from "@/lib/site-overrides-blob";
+import { resolveSiteOverrides } from "@/lib/site-content";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
 export const runtime = "nodejs";
@@ -26,27 +24,11 @@ async function requireAdmin() {
   return null;
 }
 
-function readOverridesDisk(): SiteOverrides {
-  const filePath = path.join(process.cwd(), "data", "site-overrides.json");
-  if (!existsSync(filePath)) return {};
-  try {
-    const raw = readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(raw) as unknown;
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-      return parsed as SiteOverrides;
-    }
-    return {};
-  } catch {
-    return {};
-  }
-}
-
 export async function GET() {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const fromBlob = await fetchSiteOverridesFromBlob();
-  const overrides = fromBlob !== null ? fromBlob : readOverridesDisk();
+  const overrides = await resolveSiteOverrides();
 
   return NextResponse.json({
     overrides,
