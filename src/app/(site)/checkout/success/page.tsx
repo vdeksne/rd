@@ -77,22 +77,22 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-white max-lg:pt-0 lg:pt-[max(4rem,10vh)]">
+    <main className="min-h-screen bg-white max-[1684px]:pt-0 min-[1685px]:pt-(--home-hero-top)">
       <ClearCartAfterCheckout sessionId={sessionId} />
-      <div className="mx-auto flex w-full max-w-[440px] flex-col px-4 py-12 sm:px-0 sm:py-16">
-        <div className="border border-[#e0e0e0] bg-white px-5 pb-10 pt-10 font-sans shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:px-8 sm:pt-12 sm:pb-12">
+      <div className="mx-auto flex w-full max-w-[440px] flex-col px-[var(--gallery-gutter-x)] py-[clamp(3rem,8vw,5rem)] sm:px-0 sm:py-16">
+        <div className="border border-[#e0e0e0] bg-white px-5 pb-10 pt-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:px-8 sm:pb-12 sm:pt-12">
           <div className="flex flex-col items-center text-center">
             <SuccessCheckIcon className="h-14 w-14 shrink-0 text-emerald-700" />
-            <h1 className="mt-6 text-[20px] font-bold leading-tight tracking-tight text-black">
+            <h1 className="type-gallery-ui-heading mt-6 text-neutral-950">
               Thank you
             </h1>
-            <p className="mt-3 max-w-[320px] text-[13px] font-normal leading-[1.55] text-[#666]">
+            <p className="type-gallery-body mx-auto mt-3 max-w-[320px] text-neutral-600">
               {paid && customerEmail ? (
                 <>
                   Your payment was successful. We&apos;ve received your order
                   and will follow up with shipping details. A receipt was sent
                   to{" "}
-                  <span className="font-semibold text-[#444]">
+                  <span className="font-medium text-neutral-700">
                     {customerEmail}
                   </span>
                   .
@@ -112,36 +112,36 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             </p>
 
             {sessionId ? (
-              <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#999]">
+              <p className="type-gallery-micro mt-5 uppercase tracking-[0.12em] text-neutral-500">
                 Order reference · {abbreviateSessionId(sessionId)}
               </p>
             ) : null}
 
             <Link
               href="/curate"
-              className="mt-9 flex min-h-[50px] w-full max-w-[280px] items-center justify-center bg-black px-6 text-[13px] font-bold tracking-tight text-white transition hover:bg-neutral-900"
+              className="type-gallery-caption mt-9 flex min-h-[50px] w-full max-w-[280px] items-center justify-center bg-neutral-950 px-6 text-white transition hover:bg-neutral-900"
             >
               Continue shopping
             </Link>
           </div>
 
-          <div className="mt-10 flex flex-wrap justify-center gap-x-10 gap-y-2 text-[12px] font-normal text-[#767676]">
+          <div className="mt-10 flex flex-wrap justify-center gap-x-10 gap-y-2 text-[0.8125rem] font-light text-neutral-600">
             <Link
               href="/legal/returns"
-              className="underline decoration-[#767676] underline-offset-2 hover:text-black"
+              className="hover:text-black"
             >
               Return Policy
             </Link>
             <Link
               href="/legal/terms"
-              className="underline decoration-[#767676] underline-offset-2 hover:text-black"
+              className="hover:text-black"
             >
               Terms of Service
             </Link>
           </div>
 
           <div className="mt-10 flex flex-col items-center gap-2 border-t border-[#eeeeee] pt-8">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-black">
+            <div className="type-gallery-micro flex items-center gap-2 uppercase tracking-[0.12em] text-neutral-950">
               <ShieldCheckIcon className="h-5 w-5 shrink-0 text-emerald-700" />
               Secure payment processed by Stripe
             </div>

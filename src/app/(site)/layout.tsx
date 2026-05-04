@@ -1,5 +1,6 @@
 import { CartProvider } from "@/components/cart/cart-context";
 import { SiteChrome } from "@/components/site/site-chrome";
+import { SiteMediaShield } from "@/components/site/site-media-shield";
 import { getMergedArtworks, getMergedPrimaryNav } from "@/lib/site-content";
 import "../neue-haas-font-face.css";
 
@@ -16,7 +17,9 @@ export default async function SiteLayout({
 
   return (
     <CartProvider artworks={artworks}>
-      <SiteChrome navItems={navItems}>{children}</SiteChrome>
+      <SiteMediaShield>
+        <SiteChrome navItems={navItems}>{children}</SiteChrome>
+      </SiteMediaShield>
     </CartProvider>
   );
 }

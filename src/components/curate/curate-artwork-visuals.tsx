@@ -97,16 +97,16 @@ export function CurateArtworkVisuals({
 
   const srLabel =
     lightboxVariant === "hero"
-      ? `${title} — enlarged, full image`
+      ? `${title}. Enlarged, full image`
       : lightboxVariant === "matte"
-        ? `${title} — enlarged, matte paper`
-        : `${title} — enlarged, framed`;
+        ? `${title}. Enlarged, matte paper`
+        : `${title}. Enlarged, framed`;
 
-  const metaLine = `— ${subtitle}, ${String(year)} · ${widthIn}″ × ${heightIn}″`;
+  const metaLine = `${subtitle}, ${String(year)} · ${widthIn}″ × ${heightIn}″`;
 
   return (
     <>
-      <div className="mx-auto w-full max-w-[542px] shrink-0 lg:mx-0">
+      <div className="mx-auto w-full max-w-[var(--gallery-artwork-visual-max)] shrink-0 lg:mx-0">
         <button
           type="button"
           className="relative aspect-542/361 w-full cursor-zoom-in overflow-hidden bg-neutral-200 text-left ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
@@ -119,7 +119,7 @@ export function CurateArtworkVisuals({
             alt={title}
             fill
             className="object-cover"
-            sizes="(min-width: 1024px) 542px, 100vw"
+            sizes="(min-width: 1024px) min(542px, 45vw), 100vw"
             priority
           />
         </button>
@@ -171,13 +171,13 @@ export function CurateArtworkVisuals({
                   type="button"
                   onClick={goVariantPrev}
                   aria-label="Previous view: full image, matte, or framed"
-                  className="pointer-events-auto h-full w-1/2 cursor-w-resize border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
+                  className="pointer-events-auto h-full w-1/2 cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
                 />
                 <button
                   type="button"
                   onClick={goVariantNext}
                   aria-label="Next view: full image, matte, or framed"
-                  className="pointer-events-auto h-full w-1/2 cursor-e-resize border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
+                  className="pointer-events-auto h-full w-1/2 cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
                 />
               </div>
 
@@ -219,14 +219,14 @@ export function CurateArtworkVisuals({
               ) : null}
             </div>
 
-            <div className="mt-5 shrink-0 space-y-2 text-center tracking-[0.08em] text-white">
-              <p className="type-site-display text-[11px] font-light uppercase leading-snug">
+            <div className="mt-[clamp(1rem,3vw,1.5rem)] shrink-0 flex flex-col gap-1 text-center tracking-[0.06em] text-white">
+              <p className="type-gallery-caption text-white">
                 {title}
               </p>
-              <p className="type-site-display text-[10px] font-light capitalize leading-snug text-white/75">
+              <p className="type-gallery-micro normal-case tracking-normal text-white/75">
                 {metaLine}
               </p>
-              <p className="type-site-display text-[9px] font-light uppercase tracking-widest text-white/45">
+              <p className="type-gallery-micro mt-1 uppercase tracking-[0.14em] text-white/45">
                 {VARIANT_LABEL[lightboxVariant]}
               </p>
             </div>

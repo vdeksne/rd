@@ -89,8 +89,29 @@
     Helvetica, Arial, sans-serif;
   /* Figma Home artboard — hero top inset below chrome (112:902); matches homeHeroFrame.topPaddingDesktopPx */
   --home-hero-top: 116px;
-  /* Desktop left rail — synced with SiteChrome aside width + main offset (scaled so rail title/nav clear content mid-viewport). */
-  --site-rail: clamp(18.25rem, calc(18vw + 7.5rem), 21rem);
+  /* Desktop left rail — aside width + main offset; tighter than wide empty gutter beside nav. */
+  --site-rail: clamp(14rem, calc(11vw + 6.5rem), 17.25rem);
+
+  /* Editorial gallery — column widths, gutters, image slots (px ÷ 16) */
+  --gallery-max-content: 75.125rem; /* 1202 — home hero & primary media */
+  --gallery-max-frame: 103rem; /* ~1648px — curate index grid */
+  --gallery-max-detail-layout: 90rem; /* 1440 — artwork detail shell */
+  --gallery-max-about: 76.625rem; /* 1226 — about */
+  --gallery-max-detail-copy: 38.3125rem; /* 613 — artwork statement column */
+  --gallery-artwork-visual-max: 33.875rem; /* 542 — detail hero thumb */
+  --gallery-about-portrait-max: 30.875rem; /* 494 */
+  --gallery-cart-thumb: 11.25rem; /* 180 */
+  --gallery-checkout-thumb: 5rem; /* 80 */
+
+  --gallery-gutter-x: clamp(1rem, 4vw, 2.5rem);
+  --gallery-gutter-index: max(0.75rem, 2.25vw);
+  --gallery-detail-gap: clamp(1.5rem, 4vw, 3rem);
+  --gallery-section-pad-bottom: 6rem;
+  --gallery-prose-measure: 65ch;
+
+  --gallery-grid-gap-x: 0.625rem; /* 10px */
+  --gallery-grid-gap-y-sm: 0.5rem;
+  --gallery-grid-gap-y-lg: 1.375rem;
 }
 
 .dark {
@@ -137,9 +158,22 @@
   html {
     @apply font-sans;
   }
+  a,
+  a:visited {
+    text-decoration: none;
+  }
 }
 
 @layer components {
+  /* Public site: discourage drag/save/long-press on artwork <img>; paired with SiteMediaShield handlers */
+  .site-public-media-root img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
   /* Figma Raivis_WebDev — sidebar title (node 112-901 area) */
   .type-display-h1 {
     font-family: var(--font-display-stack);
@@ -196,5 +230,133 @@
    */
   .type-site-display {
     font-family: var(--font-display-stack);
+  }
+
+  /**
+   * Gallery / curator editorial scale — light display, restrained weights,
+   * generous line-height on body; caps + tracking mostly for captions & labels.
+   */
+  .type-gallery-hero {
+    font-family: var(--font-display-stack);
+    font-size: clamp(2.25rem, 4vw + 1rem, 3.75rem);
+    font-weight: 300;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+  }
+
+  .type-gallery-page-title {
+    font-family: var(--font-display-stack);
+    font-size: clamp(1.375rem, 1.2vw + 1.05rem, 1.75rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .type-gallery-ui-heading {
+    font-family: var(--font-display-stack);
+    font-size: clamp(1.125rem, 0.5vw + 1rem, 1.375rem);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .type-gallery-section-label {
+    font-family: var(--font-display-stack);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .type-gallery-artwork-title {
+    font-family: var(--font-display-stack);
+    font-size: clamp(1rem, 0.35vw + 0.92rem, 1.125rem);
+    font-weight: 300;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+  }
+
+  .type-gallery-meta {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.9375rem, 0.2vw + 0.88rem, 1rem);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .type-gallery-caption {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.75rem, 0.15vw + 0.72rem, 0.8125rem);
+    font-weight: 300;
+    line-height: 1.45;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .type-gallery-grid-caption {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.6875rem, 0.12vw + 0.66rem, 0.8125rem);
+    font-weight: 300;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .type-gallery-micro {
+    font-family: var(--font-display-stack);
+    font-size: 0.75rem;
+    font-weight: 300;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
+  }
+
+  .type-gallery-body {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.9375rem, 0.12vw + 0.9rem, 1rem);
+    font-weight: 300;
+    line-height: 1.62;
+    max-width: var(--gallery-prose-measure);
+  }
+
+  /** Same rhythm as `.type-gallery-body` without measure constraint (multi-section columns). */
+  .type-gallery-prose {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.9375rem, 0.12vw + 0.9rem, 1rem);
+    font-weight: 300;
+    line-height: 1.62;
+  }
+
+  .type-gallery-price {
+    font-family: var(--font-display-stack);
+    font-size: clamp(1.125rem, 0.8vw + 1rem, 1.375rem);
+    font-weight: 300;
+    line-height: 1.2;
+  }
+
+  .type-gallery-card-title {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.8125rem, 0.45vw + 0.76rem, 1.125rem);
+    font-weight: 300;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .type-gallery-card-meta {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.6875rem, 0.12vw + 0.66rem, 0.8125rem);
+    font-weight: 300;
+    line-height: 1.35;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .type-gallery-numeric {
+    font-family: var(--font-display-stack);
+    font-size: clamp(0.9375rem, 0.5vw + 0.85rem, 1.25rem);
+    font-weight: 300;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 }

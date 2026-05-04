@@ -169,14 +169,14 @@ export function PortfolioGallery({
     : "duration-[900ms]";
 
   return (
-    <div className="mx-auto w-full max-w-[960px]">
+    <div className="flex w-full flex-col items-center">
       <div
-        className="relative aspect-1202/801 w-full overflow-hidden bg-neutral-100 select-none"
+        className="relative aspect-1202/801 w-full max-w-full overflow-hidden bg-neutral-100 select-none"
         role={multi ? "region" : undefined}
         aria-roledescription={multi ? "image carousel" : undefined}
         aria-label={
           multi
-            ? "Portfolio images — click left or right for previous or next; autoplay pauses on hover"
+            ? "Portfolio images. Click left or right for previous or next; autoplay pauses on hover."
             : undefined
         }
         onMouseEnter={() => multi && setHoverPaused(true)}
@@ -196,7 +196,7 @@ export function PortfolioGallery({
             alt=""
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, 960px"
+            sizes="(max-width: 768px) 100vw, min(1202px, 90vw)"
             priority={active === boundedInitial}
             draggable={false}
           />
@@ -211,7 +211,7 @@ export function PortfolioGallery({
                 crossfadeDurationClass,
                 crossfade.reveal ? "z-0 opacity-0" : "z-10 opacity-100",
               )}
-              sizes="(max-width: 768px) 100vw, 960px"
+              sizes="(max-width: 768px) 100vw, min(1202px, 90vw)"
               priority={crossfade.from === boundedInitial}
               draggable={false}
             />
@@ -224,7 +224,7 @@ export function PortfolioGallery({
                 crossfadeDurationClass,
                 crossfade.reveal ? "z-10 opacity-100" : "z-0 opacity-0",
               )}
-              sizes="(max-width: 768px) 100vw, 960px"
+              sizes="(max-width: 768px) 100vw, min(1202px, 90vw)"
               priority={crossfade.to === boundedInitial}
               draggable={false}
             />
@@ -236,7 +236,7 @@ export function PortfolioGallery({
             alt=""
             fill
             className="z-0 object-cover"
-            sizes="(max-width: 768px) 100vw, 960px"
+            sizes="(max-width: 768px) 100vw, min(1202px, 90vw)"
             priority={active === boundedInitial}
             draggable={false}
           />
@@ -247,28 +247,23 @@ export function PortfolioGallery({
               type="button"
               onClick={goPrev}
               aria-label="Previous image"
-              className="pointer-events-auto h-full w-1/2 cursor-w-resize border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset"
+              className="pointer-events-auto h-full w-1/2 cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset"
             />
             <button
               type="button"
               onClick={goNext}
               aria-label="Next image"
-              className="pointer-events-auto h-full w-1/2 cursor-e-resize border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset"
+              className="pointer-events-auto h-full w-1/2 cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset"
             />
           </div>
         ) : null}
       </div>
 
-      <div
-        className={cn(
-          "max-lg:mt-[3px] lg:mt-8",
-          !multi && "flex justify-center",
-        )}
-      >
+      <div className="mt-[2px] flex w-full justify-center">
         <div
           ref={stripRef}
           className={cn(
-            "flex min-w-0 w-full gap-[3px] overflow-x-auto overscroll-x-contain",
+            "inline-flex max-w-full min-w-0 gap-[2px] overflow-x-auto overscroll-x-contain",
             "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
           )}
           role="group"
@@ -287,9 +282,8 @@ export function PortfolioGallery({
                 aria-label={`Show ${slide.title}`}
                 onClick={() => setActive(i)}
                 className={cn(
-                  "relative h-[98px] w-[148px] shrink-0 overflow-hidden bg-neutral-100 transition-opacity",
+                  "relative h-[123px] w-[185px] shrink-0 overflow-hidden bg-neutral-100",
                   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
-                  selected ? "opacity-100" : "opacity-40 hover:opacity-[0.65]",
                 )}
               >
                 <Image
@@ -297,7 +291,7 @@ export function PortfolioGallery({
                   alt=""
                   fill
                   className="object-cover object-center scale-[1.18]"
-                  sizes="148px"
+                  sizes="185px"
                 />
               </button>
             );
@@ -305,11 +299,11 @@ export function PortfolioGallery({
         </div>
       </div>
 
-      <article className="mt-12 space-y-4 text-[12px] capitalize tracking-[0.08em]">
+      <article className="mt-8 w-full space-y-3 text-[12px] capitalize tracking-[0.08em]">
         <h1 className="type-site-display text-[12px] font-semibold leading-[18px]">
           {current.title}
         </h1>
-        <div className="space-y-4 font-light leading-[18px]">
+        <div className="space-y-3 font-light leading-[18px]">
           {current.body.map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
           ))}

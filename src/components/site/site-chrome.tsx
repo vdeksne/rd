@@ -16,15 +16,14 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
 
       <aside
         className={cn(
-          "pointer-events-none fixed inset-y-0 left-0 z-20 hidden min-h-0 w-[min(100%,var(--site-rail))] lg:flex lg:min-h-svh lg:flex-col",
+          "pointer-events-none fixed inset-y-0 left-0 z-20 hidden min-h-0 w-[min(100%,var(--site-rail))] min-[1685px]:flex min-[1685px]:min-h-svh min-[1685px]:flex-col",
         )}
       >
-        <div className="pointer-events-auto flex min-h-0 min-w-0 max-w-full flex-1 flex-col px-[max(1rem,3.3vw)] pt-[clamp(2rem,5vw,58px)] pb-8 lg:px-6">
+        <div className="pointer-events-auto flex min-h-0 min-w-0 max-w-full flex-1 flex-col overflow-x-hidden px-[max(1rem,3.3vw)] pt-[clamp(2rem,5vw,58px)] pb-8 min-[1685px]:px-6">
           <Link
             href="/"
             className={cn(
-              "type-display-h1 flex min-w-0 max-w-full flex-col justify-center leading-tight text-black",
-              "text-balance whitespace-normal xl:whitespace-nowrap",
+              "type-display-h1 flex min-w-0 max-w-full shrink-0 flex-col justify-center leading-tight whitespace-nowrap text-black",
               "min-[1920px]:h-29 min-[1920px]:w-59.75",
             )}
           >
@@ -53,7 +52,7 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
       <Link
         href="/cart"
         className={cn(
-          "fixed right-[max(1rem,2.4vw)] top-[max(1rem,3.9vh)] z-30 hidden text-black lg:flex",
+          "fixed right-[max(1rem,2.4vw)] bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 hidden text-black min-[1685px]:flex",
           "h-10 min-w-10 items-center justify-center rounded-full border border-transparent bg-white shadow-none",
           "transition-colors hover:border-black/10",
         )}
@@ -65,28 +64,33 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
       <div
         className={cn(
           /* No z-index here: fixed overlays inside children (e.g. curate lightbox) must not be
-           * trapped below chrome (cart z-30, mobile header z-40). */
-          "relative flex min-h-screen flex-col pl-0 lg:pl-[var(--site-rail)]",
-          /* Clear fixed mobile header: match its pt (max(12px, safe)) + row (h-11) + pb-3. */
-          "max-lg:pt-[calc(max(0.75rem,env(safe-area-inset-top,0px))+3.75rem)] lg:pt-0",
+           * trapped below chrome (desktop cart z-30, mobile header z-40). */
+          "relative flex min-h-screen flex-col pl-0 min-[1685px]:pl-[var(--site-rail)]",
+          /* Clear fixed mobile header: safe-area + extra top inset + title + gap + nav (~6.75rem). */
+          "max-[1684px]:pt-[calc(max(1rem,env(safe-area-inset-top,0px))+6.75rem)] min-[1685px]:pt-0",
         )}
       >
-        {/*
-          Mobile: generous bottom inset (same intent as cart `pb-32`) so scrolling content clears
-          the © bar and home-indicator; avoid perceived overlap where the footer reads “on top”
-          of the last paragraph. Safe area stacks with 8rem.
-        */}
-        <div className="flex min-h-0 flex-1 flex-col max-lg:pb-[calc(8rem+env(safe-area-inset-bottom,0px))]">
-          {children}
-        </div>
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         <footer
           className={cn(
-            "type-display-copyright shrink-0 bg-white px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-4 sm:hidden",
-            "max-lg:border-t max-lg:border-neutral-100",
+            "flex shrink-0 items-center justify-between gap-4 border-t border-neutral-100 bg-white px-4 py-4 sm:px-6 min-[1685px]:hidden",
+            "pb-[max(1rem,env(safe-area-inset-bottom))] pt-4",
           )}
+          role="contentinfo"
           aria-label="Site"
         >
-          © RAIVIS DEUTSCHMAN
+          <p className="type-display-copyright min-w-0 text-left">© RAIVIS DEUTSCHMAN</p>
+          <Link
+            href="/cart"
+            className={cn(
+              "flex h-11 min-w-11 shrink-0 touch-manipulation items-center justify-center rounded-full",
+              "border border-transparent text-black transition-colors hover:border-black/10",
+              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/40",
+            )}
+            aria-label="Shopping cart"
+          >
+            <CartIcon className="h-7 w-[23px] shrink-0" />
+          </Link>
         </footer>
       </div>
     </div>

@@ -25,8 +25,8 @@ export default async function CurateDetailPage({ params }: Props) {
     });
 
   return (
-    <main className="relative min-h-screen bg-white pb-24 max-lg:pt-0 lg:pt-[116px]">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-6 lg:flex-row lg:items-start lg:gap-[6vw] lg:px-[max(1rem,8vw)]">
+    <main className="relative min-h-screen bg-white pb-[var(--gallery-section-pad-bottom)] max-[1684px]:pt-0 min-[1685px]:pt-(--home-hero-top)">
+      <div className="mx-auto flex w-full max-w-[var(--gallery-max-detail-layout)] flex-col gap-[var(--gallery-detail-gap)] px-[var(--gallery-gutter-x)] lg:flex-row lg:items-start lg:px-[max(1rem,8vw)]">
         <CurateArtworkVisuals
           imageSrc={art.imageSrc}
           title={art.title}
@@ -36,60 +36,65 @@ export default async function CurateDetailPage({ params }: Props) {
           heightIn={art.heightIn}
         />
 
-        <div className="flex max-w-[613px] flex-col gap-9 text-[12px] capitalize tracking-[0.08em] text-black">
-          <div className="space-y-2.5">
-            <h1 className="type-site-display text-[12px] font-light leading-[18px] text-black">
+        <div className="flex max-w-[var(--gallery-max-detail-copy)] flex-col gap-[clamp(1.75rem,4vw,2.25rem)] normal-case text-neutral-950">
+          <div className="flex flex-col gap-1">
+            <h1 className="type-gallery-artwork-title text-balance">
               {art.title}
             </h1>
-            <p className="type-site-display font-light leading-[18px] text-black">
-              — {art.subtitle}, {String(art.year)} · {art.widthIn}″ ×{" "}
+            <p className="type-gallery-meta">
+              {art.subtitle}, {String(art.year)} · {art.widthIn}″ ×{" "}
               {art.heightIn}″*
             </p>
-            <p className="text-[10px] font-light leading-[18px] text-black">
-              print dimensions shown in inches — unframed (excluding passepartout)
+            <p className="type-gallery-micro mt-[clamp(0.375rem,1.5vw,0.5rem)] text-neutral-700">
+              print dimensions shown in inches, unframed (excluding
+              passepartout)
             </p>
           </div>
 
-          <div className="flex flex-wrap items-end gap-x-9 gap-y-6">
-            <p className="type-site-display max-w-[218px] font-light leading-[18px] text-black">
-              edition of {art.editionTotal} — {art.editionAvailable} available
+          <div className="flex flex-col gap-[clamp(0.375rem,1.5vw,0.5rem)]">
+            <p className="type-gallery-meta max-w-[13.625rem]">
+              edition of {art.editionTotal}, {art.editionAvailable} available
             </p>
-            <div className="flex flex-col gap-2.5">
-              <p className="type-site-display text-[20px] font-light leading-[18px] text-black">
-                €{fmt(art.priceEur)}
-              </p>
-              <AddToCart slug={art.slug} />
-              <p className="text-[11px] font-normal normal-case text-black">
-                Or{" "}
-                <Link href="mailto:acquire@raivisdeutschman.com" className="underline">
-                  inquire to acquire
-                </Link>{" "}
-                for framing options.
-              </p>
-            </div>
+            <p className="type-gallery-micro normal-case text-neutral-800">
+              Or{" "}
+              <Link
+                href="mailto:acquire@raivisdeutschman.com"
+                className="hover:text-neutral-950"
+              >
+                inquire to acquire
+              </Link>{" "}
+              for framing options.
+            </p>
           </div>
 
-          <div className="space-y-3 font-light leading-[18px] text-black">
+          <div className="type-gallery-body max-w-none space-y-[clamp(0.625rem,2vw,1rem)] text-neutral-950">
             <p>
-              museum-quality deep matte paper —
+              museum-quality deep matte paper
               <br />
               the inherent textures of making remain, hence the visible grain.
               <br />
-              crafted in a precisely calibrated environment —
+              crafted in a precisely calibrated environment
               <br />
-              subtle tonal shifts may occur due to variations in color reproduction
-              across screens.
+              subtle tonal shifts may occur due to variations in color
+              reproduction across screens.
             </p>
             <p>
-              hand-signed and numbered by the artist as part of a limited edition —
+              hand-signed and numbered by the artist as part of a limited
+              edition
               <br />
               artisanal frame glazed with acrylic, white passepartout.
               <br />
-              sizes are determined individually, in accordance with each image’s intent —
+              sizes are determined individually, in accordance with each image’s
+              intent
               <br />
-              this piece measures {art.widthIn} × {art.heightIn} inch, referring to the
-              overall framed work.
+              this piece measures {art.widthIn} × {art.heightIn} inch, referring
+              to the overall framed work.
             </p>
+          </div>
+
+          <div className="flex flex-col gap-[clamp(0.5rem,1.5vw,0.625rem)]">
+            <p className="type-gallery-price">€{fmt(art.priceEur)}</p>
+            <AddToCart slug={art.slug} />
           </div>
         </div>
       </div>

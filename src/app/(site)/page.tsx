@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { getMergedHomeHero, getMergedHomeHeroFrame } from "@/lib/site-content";
 
 const heroSizes =
-  "(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc(100vw - 48px), calc(100vw - var(--site-rail) - 80px)";
+  "(max-width: 639px) calc(100vw - 2 * var(--gallery-gutter-x)), (max-width: 1684px) calc(100vw - 2 * var(--gallery-gutter-x)), calc(100vw - var(--site-rail) - 2 * var(--gallery-gutter-x))";
 
 export default async function HomePage() {
   const homeHero = await getMergedHomeHero();
@@ -13,14 +13,14 @@ export default async function HomePage() {
   const { widthPx, heightPx } = homeHeroFrame;
 
   return (
-    <main className="relative flex w-full min-w-0 flex-col items-center bg-white max-lg:pt-0 lg:pt-(--home-hero-top)">
-      <div className="flex w-full justify-center px-4 sm:px-6 lg:px-10">
-        <div className="w-full min-w-0 max-w-[1202px]">
+    <main className="relative flex w-full min-w-0 flex-col items-center bg-white max-[1684px]:pt-0 min-[1685px]:pt-(--home-hero-top)">
+      <div className="flex w-full justify-center px-[var(--gallery-gutter-x)]">
+        <div className="w-full min-w-0 max-w-[var(--gallery-max-content)]">
           <div
             className={cn(
               "relative w-full overflow-hidden bg-neutral-100",
-              "max-lg:aspect-3/4",
-              "lg:aspect-(--home-hero-ar)",
+              "max-[1684px]:aspect-3/4",
+              "min-[1685px]:aspect-(--home-hero-ar)",
             )}
             style={
               {
@@ -40,12 +40,12 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
-      <div className="mt-2 flex w-full justify-center px-4 sm:px-6 lg:px-10">
-        <p className="type-site-display w-full min-w-0 max-w-[1202px] text-[11.6px] font-light uppercase leading-[18px] tracking-[0.08em]">
+      <div className="mt-[clamp(0.375rem,1.5vw,0.75rem)] flex w-full justify-center px-[var(--gallery-gutter-x)]">
+        <p className="type-gallery-caption w-full min-w-0 max-w-[var(--gallery-max-content)] text-neutral-700">
           <span>{homeHero.captionBefore}</span>
           <Link
             href={homeHero.captionLinkHref}
-            className="font-light underline underline-offset-2"
+            className="transition hover:text-neutral-900"
             target="_blank"
             rel="noreferrer"
           >

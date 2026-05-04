@@ -2,7 +2,7 @@ import { AdminDashboard } from "./admin-dashboard";
 import { loadSiteOverrides } from "@/lib/site-content";
 import { getSiteEditorDefaults } from "@/lib/site-editor-defaults";
 
-export const metadata = { title: "Admin — Raivis Deutschman", robots: "noindex" };
+export const metadata = { title: "Admin · Raivis Deutschman", robots: "noindex" };
 
 export default async function AdminHomePage() {
   const overrides = await loadSiteOverrides();

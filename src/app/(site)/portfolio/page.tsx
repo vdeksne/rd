@@ -9,8 +9,8 @@ export default async function PortfolioPage() {
   const portfolioDefaultSlideIndex = await getMergedPortfolioDefaultSlideIndex();
 
   return (
-    <main className="bg-white pb-24 max-lg:pt-0 lg:pt-[116px]">
-      <div className="mx-auto w-full max-w-[1202px] px-6 sm:px-0">
+    <main className="bg-white pb-[var(--gallery-section-pad-bottom)] max-[1684px]:pt-0 min-[1685px]:pt-(--home-hero-top)">
+      <div className="mx-auto w-full max-w-[var(--gallery-max-content)] px-[var(--gallery-gutter-x)] min-[1685px]:-translate-x-[calc(var(--site-rail)/2)]">
         <PortfolioGallery
           slides={portfolioSlides}
           initialIndex={portfolioDefaultSlideIndex}

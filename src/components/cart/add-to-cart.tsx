@@ -12,7 +12,7 @@ export function AddToCart({ slug }: { slug: string }) {
     <Button
       type="button"
       variant="outline"
-      className="type-site-display h-auto rounded-none border border-black bg-transparent px-6 py-2 text-[12px] font-light capitalize tracking-[0.08em] text-black shadow-none hover:bg-black hover:text-white"
+      className="type-gallery-caption h-auto rounded-none border border-black bg-transparent px-[clamp(1.25rem,4vw,1.75rem)] py-[clamp(0.375rem,2vw,0.5rem)] normal-case tracking-[0.06em] text-black shadow-none hover:bg-black hover:text-white"
       onClick={() => {
         add(slug, 1);
         router.push("/cart");

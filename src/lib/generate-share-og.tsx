@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
-export const OG_ALT = "Raivis Deutschman — Fine Art";
+export const OG_ALT = "Raivis Deutschman · Fine Art";
 
 const W_H = 75 / 30;
 

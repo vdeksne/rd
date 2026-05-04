@@ -271,7 +271,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               }
             />
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="cap-before">Caption — before link</Label>
+              <Label htmlFor="cap-before">Caption (before link)</Label>
               <Input
                 id="cap-before"
                 value={homeHero.captionBefore ?? ""}
@@ -307,7 +307,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="cap-after">Caption — after link</Label>
+              <Label htmlFor="cap-after">Caption (after link)</Label>
               <Input
                 id="cap-after"
                 value={homeHero.captionAfter ?? ""}
@@ -473,7 +473,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
             Curate artworks
           </h2>
           <p className="text-xs text-neutral-600">
-            Slug changes URLs — edit carefully. Price in euros; dimensions in
+            Slug changes URLs; edit carefully. Price in euros; dimensions in
             inches.
           </p>
           <div className="space-y-10">

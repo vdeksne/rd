@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   metadataBase,
   title: {
     default: "Raivis Deutschman - Fine Art",
-    template: "%s — Raivis Deutschman",
+    template: "%s · Raivis Deutschman",
   },
   description: siteDescription,
   // Icons: `src/app/icon.svg` + `apple-icon.svg` from `public/images/logo.svg`
