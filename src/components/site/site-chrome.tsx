@@ -19,18 +19,15 @@ export function SiteChrome({ children, navItems }: SiteChromeProps) {
           "pointer-events-none fixed inset-y-0 left-0 z-20 hidden min-h-0 w-[min(100%,var(--site-rail))] min-[1685px]:flex min-[1685px]:min-h-svh min-[1685px]:flex-col",
         )}
       >
-        <div className="pointer-events-auto flex min-h-0 min-w-0 max-w-full flex-1 flex-col overflow-x-hidden px-[max(1rem,3.3vw)] pt-[clamp(2rem,5vw,58px)] pb-8 min-[1685px]:px-6">
+        <div className="pointer-events-auto flex min-h-0 min-w-0 max-w-full flex-1 flex-col overflow-x-hidden px-[max(1rem,3.3vw)] pt-[var(--rail-pt)] pb-[var(--rail-padding-bottom)] min-[1685px]:px-[var(--rail-padding-x)]">
           <Link
             href="/"
-            className={cn(
-              "type-display-h1 flex min-w-0 max-w-full shrink-0 flex-col justify-center leading-tight whitespace-nowrap text-black",
-              "min-[1920px]:h-29 min-[1920px]:w-59.75",
-            )}
+            className="type-display-h1 block min-w-0 max-w-full shrink-0 leading-tight whitespace-nowrap text-black"
           >
             Raivis Deutschman
           </Link>
           <nav
-            className="mt-[clamp(1.5rem,4vw,3.5rem)] flex flex-col gap-[22px]"
+            className="mt-[var(--rail-logo-nav-gap)] flex flex-col gap-[var(--rail-nav-link-gap)]"
             aria-label="Primary"
           >
             {navItems.map((item) => (

@@ -122,6 +122,11 @@ export async function getMergedLayoutSpacing(): Promise<LayoutSpacing> {
     gridGapYSmPx: clampFinite(c.gridGapYSmPx, 4, 40),
     gridGapYLgPx: clampFinite(c.gridGapYLgPx, 8, 56),
     legalPagePyPx: clampFinite(c.legalPagePyPx, 48, 200),
+    railInsetTopMaxPx: clampFinite(c.railInsetTopMaxPx, 24, 120),
+    railLogoToNavGapMaxPx: clampFinite(c.railLogoToNavGapMaxPx, 16, 96),
+    railPaddingXPx: clampFinite(c.railPaddingXPx, 12, 56),
+    railPaddingBottomPx: clampFinite(c.railPaddingBottomPx, 16, 120),
+    railNavLinkGapPx: clampFinite(c.railNavLinkGapPx, 8, 40),
   };
 }
 

@@ -55,6 +55,11 @@ function siteThemeCss(heroTopPx: number, spacing: LayoutSpacing): string {
   --gallery-grid-gap-y-sm: ${spacing.gridGapYSmPx}px;
   --gallery-grid-gap-y-lg: ${spacing.gridGapYLgPx}px;
   --legal-page-py: ${spacing.legalPagePyPx}px;
+  --rail-pt: clamp(2rem, 5vw, ${spacing.railInsetTopMaxPx}px);
+  --rail-logo-nav-gap: clamp(1.5rem, 4vw, ${spacing.railLogoToNavGapMaxPx}px);
+  --rail-padding-x: ${spacing.railPaddingXPx}px;
+  --rail-padding-bottom: ${spacing.railPaddingBottomPx}px;
+  --rail-nav-link-gap: ${spacing.railNavLinkGapPx}px;
 }`;
 }
 

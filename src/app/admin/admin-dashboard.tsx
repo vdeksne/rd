@@ -182,6 +182,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
         gridGapYSmPx: Number(layoutSpacing.gridGapYSmPx),
         gridGapYLgPx: Number(layoutSpacing.gridGapYLgPx),
         legalPagePyPx: Number(layoutSpacing.legalPagePyPx),
+        railInsetTopMaxPx: Number(layoutSpacing.railInsetTopMaxPx),
+        railLogoToNavGapMaxPx: Number(layoutSpacing.railLogoToNavGapMaxPx),
+        railPaddingXPx: Number(layoutSpacing.railPaddingXPx),
+        railPaddingBottomPx: Number(layoutSpacing.railPaddingBottomPx),
+        railNavLinkGapPx: Number(layoutSpacing.railNavLinkGapPx),
       },
     };
   }, [
@@ -501,6 +506,56 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               committed={layoutSpacing.siteRailMaxRem}
               onCommit={(n) =>
                 setLayoutSpacing((s) => ({ ...s, siteRailMaxRem: n }))
+              }
+            />
+          </div>
+          <div className="flex items-center justify-between gap-6">
+            <span className="text-[13px] text-neutral-600">Rail · top max</span>
+            <AdminSpacingInput
+              id="sp-rail-pt-max"
+              committed={layoutSpacing.railInsetTopMaxPx}
+              onCommit={(n) =>
+                setLayoutSpacing((s) => ({ ...s, railInsetTopMaxPx: n }))
+              }
+            />
+          </div>
+          <div className="flex items-center justify-between gap-6">
+            <span className="text-[13px] text-neutral-600">Rail · logo→nav</span>
+            <AdminSpacingInput
+              id="sp-rail-logo-nav"
+              committed={layoutSpacing.railLogoToNavGapMaxPx}
+              onCommit={(n) =>
+                setLayoutSpacing((s) => ({ ...s, railLogoToNavGapMaxPx: n }))
+              }
+            />
+          </div>
+          <div className="flex items-center justify-between gap-6">
+            <span className="text-[13px] text-neutral-600">Rail · horizontal</span>
+            <AdminSpacingInput
+              id="sp-rail-pad-x"
+              committed={layoutSpacing.railPaddingXPx}
+              onCommit={(n) =>
+                setLayoutSpacing((s) => ({ ...s, railPaddingXPx: n }))
+              }
+            />
+          </div>
+          <div className="flex items-center justify-between gap-6">
+            <span className="text-[13px] text-neutral-600">Rail · bottom</span>
+            <AdminSpacingInput
+              id="sp-rail-pad-bottom"
+              committed={layoutSpacing.railPaddingBottomPx}
+              onCommit={(n) =>
+                setLayoutSpacing((s) => ({ ...s, railPaddingBottomPx: n }))
+              }
+            />
+          </div>
+          <div className="flex items-center justify-between gap-6">
+            <span className="text-[13px] text-neutral-600">Rail · link gap</span>
+            <AdminSpacingInput
+              id="sp-rail-nav-gap"
+              committed={layoutSpacing.railNavLinkGapPx}
+              onCommit={(n) =>
+                setLayoutSpacing((s) => ({ ...s, railNavLinkGapPx: n }))
               }
             />
           </div>

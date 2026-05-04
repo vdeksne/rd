@@ -117,6 +117,12 @@
   --checkout-form-py: clamp(3rem, 8vw, 80px);
   --checkout-empty-py: clamp(4rem, 12vw, 128px);
   --legal-page-py: 96px;
+
+  --rail-pt: clamp(2rem, 5vw, 58px);
+  --rail-logo-nav-gap: clamp(1.5rem, 4vw, 56px);
+  --rail-padding-x: 24px;
+  --rail-padding-bottom: 32px;
+  --rail-nav-link-gap: 22px;
 }
 
 .dark {

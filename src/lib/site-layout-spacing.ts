@@ -24,6 +24,17 @@ export type LayoutSpacing = {
   gridGapYLgPx: number;
   /** Legal pages vertical padding (`--legal-page-py`), px */
   legalPagePyPx: number;
+
+  /** Desktop left rail · top inset clamp max (`--rail-pt`), px — logo sits below */
+  railInsetTopMaxPx: number;
+  /** Desktop left rail · space logo → nav (`--rail-logo-nav-gap`), px clamp max */
+  railLogoToNavGapMaxPx: number;
+  /** Desktop left rail · horizontal padding ≥1685px (`--rail-padding-x`), px */
+  railPaddingXPx: number;
+  /** Desktop left rail · bottom padding (`--rail-padding-bottom`), px */
+  railPaddingBottomPx: number;
+  /** Desktop left rail · gap between nav links (`--rail-nav-link-gap`), px */
+  railNavLinkGapPx: number;
 };
 
 export const layoutSpacingDefaults: LayoutSpacing = {
@@ -39,6 +50,11 @@ export const layoutSpacingDefaults: LayoutSpacing = {
   gridGapYSmPx: 8,
   gridGapYLgPx: 22,
   legalPagePyPx: 96,
+  railInsetTopMaxPx: 58,
+  railLogoToNavGapMaxPx: 56,
+  railPaddingXPx: 24,
+  railPaddingBottomPx: 32,
+  railNavLinkGapPx: 22,
 };
 
 /** Merge saved overrides into defaults; ignores non-finite numbers (e.g. null from JSON). */
@@ -65,5 +81,10 @@ export function coerceLayoutSpacingInput(
     gridGapYSmPx: n("gridGapYSmPx"),
     gridGapYLgPx: n("gridGapYLgPx"),
     legalPagePyPx: n("legalPagePyPx"),
+    railInsetTopMaxPx: n("railInsetTopMaxPx"),
+    railLogoToNavGapMaxPx: n("railLogoToNavGapMaxPx"),
+    railPaddingXPx: n("railPaddingXPx"),
+    railPaddingBottomPx: n("railPaddingBottomPx"),
+    railNavLinkGapPx: n("railNavLinkGapPx"),
   };
 }
