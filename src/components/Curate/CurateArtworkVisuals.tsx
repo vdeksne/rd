@@ -7,7 +7,7 @@ import {
   FramedArtOriginal,
   MatteArtworkSurface,
   type ArtworkInsetEnlargeVariant,
-} from "@/components/curate/artwork-detail-inlays";
+} from "@/components/Curate/ArtworkDetailInlays";
 
 type LightboxVariant = "hero" | ArtworkInsetEnlargeVariant;
 

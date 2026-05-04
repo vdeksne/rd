@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
-import { CartProvider } from "@/components/cart/cart-context";
-import { AddToCart } from "@/components/cart/add-to-cart";
+import { CartProvider } from "@/components/Cart/CartContext";
+import { AddToCart } from "@/components/Cart/AddToCart";
 import { demoArtworks } from "@/lib/demo-content";
 
 const meta = {

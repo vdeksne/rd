@@ -1,114 +1,27 @@
 "use client";
 
-import { AdminImageUrlField } from "@/components/admin/admin-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { AdminImageUrlField } from "@/components/Admin/AdminImageUrlField";
+import {
+  type ApiLoad,
+  bootstrapEditor,
+  buildOverridesPayload,
+  editorInitialState,
+  editorReducer,
+} from "@/components/AdminDashboard/AdminDashboardEditor";
+import { AdminSpacingInput } from "@/components/AdminDashboard/AdminSpacingInput";
+import { Button } from "@/components/Ui/Button";
+import { Input } from "@/components/Ui/Input";
+import { Label } from "@/components/Ui/Label";
 import { portfolioSlideSrc } from "@/lib/demo-content";
-import type { SiteEditorDefaults } from "@/lib/site-editor-defaults";
-import { coerceLayoutSpacingInput } from "@/lib/site-layout-spacing";
-import type { SiteOverrides } from "@/lib/site-overrides-types";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { flushSync } from "react-dom";
-import { useCallback, useMemo, useState } from "react";
-
-/** Plain text field so values can be cleared while typing; commits on blur. */
-function AdminSpacingInput({
-  id,
-  committed,
-  onCommit,
-  inputMode = "numeric",
-}: {
-  id: string;
-  committed: number;
-  onCommit: (n: number) => void;
-  inputMode?: "numeric" | "decimal";
-}) {
-  const [draft, setDraft] = useState<string | null>(null);
-  const display =
-    draft !== null ? draft : Number.isFinite(committed) ? String(committed) : "";
-
-  return (
-    <Input
-      id={id}
-      type="text"
-      autoComplete="off"
-      inputMode={inputMode}
-      className="h-8 w-17 text-right text-[13px] tabular-nums"
-      value={display}
-      onChange={(e) => setDraft(e.target.value)}
-      onFocus={() =>
-        setDraft(Number.isFinite(committed) ? String(committed) : "")
-      }
-      onBlur={() => {
-        if (draft === null) return;
-        const raw = draft.trim();
-        flushSync(() => {
-          setDraft(null);
-          if (raw === "") return;
-          const n = Number(raw);
-          if (!Number.isFinite(n)) return;
-          onCommit(n);
-        });
-      }}
-    />
-  );
-}
-
-type ApiLoad = {
-  overrides: SiteOverrides;
-  defaults: SiteEditorDefaults;
-};
-
-function cloneJson<T>(x: T): T {
-  return JSON.parse(JSON.stringify(x)) as T;
-}
-
-function bootstrapEditor(initial: ApiLoad) {
-  const { overrides, defaults } = initial;
-  const navItems =
-    overrides.nav?.items?.length === defaults.nav.length
-      ? overrides.nav.items!.map((n) => ({ ...n }))
-      : defaults.nav.map((n) => ({ ...n }));
-  const homeHeroMerged = {
-    ...defaults.homeHero,
-    ...(overrides.homeHero ?? {}),
-  } as Record<string, string>;
-  const homeFrameMerged = {
-    ...defaults.homeHeroFrame,
-    ...(overrides.homeHeroFrame ?? {}),
-  };
-  const portfolioIdx =
-    typeof overrides.portfolioDefaultSlideIndex === "number"
-      ? overrides.portfolioDefaultSlideIndex
-      : defaults.portfolioDefaultSlideIndex;
-  const slidesMerged = overrides.portfolioSlides?.length
-    ? cloneJson(overrides.portfolioSlides)
-    : cloneJson(defaults.portfolioSlides);
-  const artworksMerged = overrides.artworks?.length
-    ? cloneJson(overrides.artworks)
-    : cloneJson(defaults.artworks);
-  const ab = overrides.aboutContent;
-  const aboutImgMerged = ab?.imageSrc ?? defaults.aboutContent.imageSrc;
-  const aboutSectionsMerged = cloneJson(
-    ab?.sections ?? defaults.aboutContent.sections,
-  );
-  const layoutSpacingMerged = coerceLayoutSpacingInput(overrides.layoutSpacing);
-
-  return {
-    navItems,
-    homeHero: homeHeroMerged,
-    homeFrame: homeFrameMerged,
-    portfolioIndex: portfolioIdx,
-    slides: slidesMerged,
-    artworks: artworksMerged,
-    aboutImg: aboutImgMerged,
-    aboutSections: aboutSectionsMerged,
-    layoutSpacing: layoutSpacingMerged,
-  };
-}
+import {
+  useCallback,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 
 const tabs = [
   ["home", "Home hero"],
@@ -124,73 +37,13 @@ const adminTextarea =
 export function AdminDashboard({ initial }: { initial: ApiLoad }) {
   const router = useRouter();
   const seed = useMemo(() => bootstrapEditor(initial), [initial]);
-  const [tab, setTab] = useState<(typeof tabs)[number][0]>("home");
-  const [busy, setBusy] = useState(false);
-  const [savedMsg, setSavedMsg] = useState<string | null>(null);
-  const [saveError, setSaveError] = useState<string | null>(null);
-
-  const [homeHero, setHomeHero] = useState(seed.homeHero);
-  const [homeFrame, setHomeFrame] = useState(seed.homeFrame);
-  const [portfolioIndex, setPortfolioIndex] = useState(seed.portfolioIndex);
-  const [slides, setSlides] = useState(seed.slides);
-  const [artworks, setArtworks] = useState(seed.artworks);
-  const [aboutImg, setAboutImg] = useState(seed.aboutImg);
-  const [aboutSections, setAboutSections] = useState(seed.aboutSections);
-  const [layoutSpacing, setLayoutSpacing] = useState(seed.layoutSpacing);
-
-  const buildPayload = useCallback((): SiteOverrides => {
-    return {
-      nav: { items: seed.navItems.map((n) => ({ ...n })) },
-      homeHero: {
-        imageSrc: homeHero.imageSrc,
-        ...(homeHero.imageSrcMobile?.trim()
-          ? { imageSrcMobile: homeHero.imageSrcMobile.trim() }
-          : {}),
-        captionBefore: homeHero.captionBefore,
-        captionLinkText: homeHero.captionLinkText,
-        captionLinkHref: homeHero.captionLinkHref,
-        captionAfter: homeHero.captionAfter,
-      },
-      homeHeroFrame: {
-        widthPx: Number(homeFrame.widthPx),
-        heightPx: Number(homeFrame.heightPx),
-        topPaddingDesktopPx: Number(homeFrame.topPaddingDesktopPx),
-      },
-      portfolioDefaultSlideIndex: portfolioIndex,
-      portfolioSlides: slides.map((s) => ({
-        ...s,
-        body: [...s.body],
-      })),
-      artworks: artworks.map((a) => ({ ...a })),
-      aboutContent: {
-        imageSrc: aboutImg,
-        sections: aboutSections.map((s) => ({
-          heading: s.heading,
-          paragraphs: [...s.paragraphs],
-        })),
-      },
-      layoutSpacing: {
-        mainGutterMaxPx: Number(layoutSpacing.mainGutterMaxPx),
-        sectionPadBottomPx: Number(layoutSpacing.sectionPadBottomPx),
-        detailGapMaxPx: Number(layoutSpacing.detailGapMaxPx),
-        curateIndexGutterMinPx: Number(layoutSpacing.curateIndexGutterMinPx),
-        siteRailMaxRem: Number(layoutSpacing.siteRailMaxRem),
-        homeCaptionBelowMaxPx: Number(layoutSpacing.homeCaptionBelowMaxPx),
-        checkoutFormPyMaxPx: Number(layoutSpacing.checkoutFormPyMaxPx),
-        checkoutEmptyPyMaxPx: Number(layoutSpacing.checkoutEmptyPyMaxPx),
-        gridGapXPx: Number(layoutSpacing.gridGapXPx),
-        gridGapYSmPx: Number(layoutSpacing.gridGapYSmPx),
-        gridGapYLgPx: Number(layoutSpacing.gridGapYLgPx),
-        legalPagePyPx: Number(layoutSpacing.legalPagePyPx),
-        railInsetTopMaxPx: Number(layoutSpacing.railInsetTopMaxPx),
-        railLogoToNavGapMaxPx: Number(layoutSpacing.railLogoToNavGapMaxPx),
-        railPaddingXPx: Number(layoutSpacing.railPaddingXPx),
-        railPaddingBottomPx: Number(layoutSpacing.railPaddingBottomPx),
-        railNavLinkGapPx: Number(layoutSpacing.railNavLinkGapPx),
-      },
-    };
-  }, [
+  const [editor, dispatch] = useReducer(
+    editorReducer,
     seed,
+    editorInitialState,
+  );
+
+  const {
     homeHero,
     homeFrame,
     portfolioIndex,
@@ -199,6 +52,16 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
     aboutImg,
     aboutSections,
     layoutSpacing,
+  } = editor;
+
+  const [tab, setTab] = useState<(typeof tabs)[number][0]>("home");
+  const [busy, setBusy] = useState(false);
+  const [savedMsg, setSavedMsg] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const buildPayload = useCallback(() => buildOverridesPayload(seed, editor), [
+    seed,
+    editor,
   ]);
 
   async function save() {
@@ -314,7 +177,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
             label="Hero image (desktop)"
             value={homeHero.imageSrc ?? ""}
             onChange={(url) =>
-              setHomeHero((h) => ({ ...h, imageSrc: url }))
+              dispatch({ type: "homeHero", fn: (h) => ({ ...h, imageSrc: url }) })
             }
           />
           <AdminImageUrlField
@@ -324,7 +187,10 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
             hint="Optional. Upload a separate image for narrow screens, or remove to use the desktop image."
             value={homeHero.imageSrcMobile ?? ""}
             onChange={(url) =>
-              setHomeHero((h) => ({ ...h, imageSrcMobile: url }))
+              dispatch({
+                type: "homeHero",
+                fn: (h) => ({ ...h, imageSrcMobile: url }),
+              })
             }
           />
           <div className="grid gap-6 sm:grid-cols-2">
@@ -334,7 +200,10 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                 id="cap-before"
                 value={homeHero.captionBefore ?? ""}
                 onChange={(e) =>
-                  setHomeHero((h) => ({ ...h, captionBefore: e.target.value }))
+                  dispatch({
+                    type: "homeHero",
+                    fn: (h) => ({ ...h, captionBefore: e.target.value }),
+                  })
                 }
               />
             </div>
@@ -344,10 +213,13 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                 id="cap-link"
                 value={homeHero.captionLinkText ?? ""}
                 onChange={(e) =>
-                  setHomeHero((h) => ({
-                    ...h,
-                    captionLinkText: e.target.value,
-                  }))
+                  dispatch({
+                    type: "homeHero",
+                    fn: (h) => ({
+                      ...h,
+                      captionLinkText: e.target.value,
+                    }),
+                  })
                 }
               />
             </div>
@@ -357,10 +229,13 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                 id="cap-href"
                 value={homeHero.captionLinkHref ?? ""}
                 onChange={(e) =>
-                  setHomeHero((h) => ({
-                    ...h,
-                    captionLinkHref: e.target.value,
-                  }))
+                  dispatch({
+                    type: "homeHero",
+                    fn: (h) => ({
+                      ...h,
+                      captionLinkHref: e.target.value,
+                    }),
+                  })
                 }
               />
             </div>
@@ -370,7 +245,10 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                 id="cap-after"
                 value={homeHero.captionAfter ?? ""}
                 onChange={(e) =>
-                  setHomeHero((h) => ({ ...h, captionAfter: e.target.value }))
+                  dispatch({
+                    type: "homeHero",
+                    fn: (h) => ({ ...h, captionAfter: e.target.value }),
+                  })
                 }
               />
             </div>
@@ -381,10 +259,13 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                 type="number"
                 value={homeFrame.widthPx ?? ""}
                 onChange={(e) =>
-                  setHomeFrame((f) => ({
-                    ...f,
-                    widthPx: Number(e.target.value),
-                  }))
+                  dispatch({
+                    type: "homeFrame",
+                    fn: (f) => ({
+                      ...f,
+                      widthPx: Number(e.target.value),
+                    }),
+                  })
                 }
               />
             </div>
@@ -395,10 +276,13 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                 type="number"
                 value={homeFrame.heightPx ?? ""}
                 onChange={(e) =>
-                  setHomeFrame((f) => ({
-                    ...f,
-                    heightPx: Number(e.target.value),
-                  }))
+                  dispatch({
+                    type: "homeFrame",
+                    fn: (f) => ({
+                      ...f,
+                      heightPx: Number(e.target.value),
+                    }),
+                  })
                 }
               />
             </div>
@@ -414,7 +298,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-gutter-max"
               committed={layoutSpacing.mainGutterMaxPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, mainGutterMaxPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, mainGutterMaxPx: n }) })
               }
             />
           </div>
@@ -424,7 +308,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-hero-top"
               committed={Number(homeFrame.topPaddingDesktopPx)}
               onCommit={(n) =>
-                setHomeFrame((f) => ({ ...f, topPaddingDesktopPx: n }))
+                dispatch({ type: "homeFrame", fn: (f) => ({ ...f, topPaddingDesktopPx: n }) })
               }
             />
           </div>
@@ -434,7 +318,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-section-pad"
               committed={layoutSpacing.sectionPadBottomPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, sectionPadBottomPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, sectionPadBottomPx: n }) })
               }
             />
           </div>
@@ -444,7 +328,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-caption-mt"
               committed={layoutSpacing.homeCaptionBelowMaxPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, homeCaptionBelowMaxPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, homeCaptionBelowMaxPx: n }) })
               }
             />
           </div>
@@ -454,7 +338,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-detail-gap"
               committed={layoutSpacing.detailGapMaxPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, detailGapMaxPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, detailGapMaxPx: n }) })
               }
             />
           </div>
@@ -464,7 +348,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-index-gutter"
               committed={layoutSpacing.curateIndexGutterMinPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, curateIndexGutterMinPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, curateIndexGutterMinPx: n }) })
               }
             />
           </div>
@@ -474,7 +358,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-grid-x"
               committed={layoutSpacing.gridGapXPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, gridGapXPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, gridGapXPx: n }) })
               }
             />
           </div>
@@ -484,7 +368,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-grid-ys"
               committed={layoutSpacing.gridGapYSmPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, gridGapYSmPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, gridGapYSmPx: n }) })
               }
             />
           </div>
@@ -494,7 +378,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-grid-yl"
               committed={layoutSpacing.gridGapYLgPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, gridGapYLgPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, gridGapYLgPx: n }) })
               }
             />
           </div>
@@ -505,7 +389,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               inputMode="decimal"
               committed={layoutSpacing.siteRailMaxRem}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, siteRailMaxRem: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, siteRailMaxRem: n }) })
               }
             />
           </div>
@@ -515,7 +399,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-rail-pt-max"
               committed={layoutSpacing.railInsetTopMaxPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, railInsetTopMaxPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, railInsetTopMaxPx: n }) })
               }
             />
           </div>
@@ -525,7 +409,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-rail-logo-nav"
               committed={layoutSpacing.railLogoToNavGapMaxPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, railLogoToNavGapMaxPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, railLogoToNavGapMaxPx: n }) })
               }
             />
           </div>
@@ -535,7 +419,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-rail-pad-x"
               committed={layoutSpacing.railPaddingXPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, railPaddingXPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, railPaddingXPx: n }) })
               }
             />
           </div>
@@ -545,7 +429,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-rail-pad-bottom"
               committed={layoutSpacing.railPaddingBottomPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, railPaddingBottomPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, railPaddingBottomPx: n }) })
               }
             />
           </div>
@@ -555,7 +439,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-rail-nav-gap"
               committed={layoutSpacing.railNavLinkGapPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, railNavLinkGapPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, railNavLinkGapPx: n }) })
               }
             />
           </div>
@@ -565,7 +449,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-checkout-py"
               committed={layoutSpacing.checkoutFormPyMaxPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, checkoutFormPyMaxPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, checkoutFormPyMaxPx: n }) })
               }
             />
           </div>
@@ -575,7 +459,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-checkout-empty-py"
               committed={layoutSpacing.checkoutEmptyPyMaxPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, checkoutEmptyPyMaxPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, checkoutEmptyPyMaxPx: n }) })
               }
             />
           </div>
@@ -585,7 +469,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               id="sp-legal-py"
               committed={layoutSpacing.legalPagePyPx}
               onCommit={(n) =>
-                setLayoutSpacing((s) => ({ ...s, legalPagePyPx: n }))
+                dispatch({ type: "layoutSpacing", fn: (s) => ({ ...s, legalPagePyPx: n }) })
               }
             />
           </div>
@@ -606,7 +490,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
               type="number"
               min={0}
               value={portfolioIndex}
-              onChange={(e) => setPortfolioIndex(Number(e.target.value))}
+              onChange={(e) => dispatch({ type: "portfolioIndex", value: Number(e.target.value) })}
             />
           </div>
           <div className="space-y-16">
@@ -648,11 +532,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={slide.title}
                       onChange={(e) => {
                         const v = e.target.value;
-                        setSlides((prev) =>
+                        dispatch({ type: "slides", fn: (prev) =>
                           prev.map((s, j) =>
                             j === i ? { ...s, title: v } : s,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -666,7 +550,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                     hint="Upload an image file. Remove to clear this slide’s image."
                     onChange={(url) => {
                       const v = url.trim();
-                      setSlides((prev) =>
+                      dispatch({ type: "slides", fn: (prev) =>
                         prev.map((s, j) =>
                           j === i
                             ? {
@@ -676,7 +560,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                               }
                             : s,
                         ),
-                      );
+                      });
                     }}
                   />
                   </div>
@@ -693,11 +577,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                           .split(/\n\s*\n/)
                           .map((p) => p.trim())
                           .filter(Boolean);
-                        setSlides((prev) =>
+                        dispatch({ type: "slides", fn: (prev) =>
                           prev.map((s, j) =>
                             j === i ? { ...s, body: paras } : s,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -747,11 +631,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.title}
                       onChange={(e) => {
                         const v = e.target.value;
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, title: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -762,11 +646,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.subtitle}
                       onChange={(e) => {
                         const v = e.target.value;
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, subtitle: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -779,11 +663,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                         const v = e.target.value
                           .toLowerCase()
                           .replace(/\s+/g, "-");
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, slug: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -795,11 +679,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.year}
                       onChange={(e) => {
                         const v = Number(e.target.value);
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, year: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -812,11 +696,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.priceEur}
                       onChange={(e) => {
                         const v = Number(e.target.value);
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, priceEur: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -828,11 +712,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.editionTotal}
                       onChange={(e) => {
                         const v = Number(e.target.value);
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, editionTotal: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -844,11 +728,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.editionAvailable}
                       onChange={(e) => {
                         const v = Number(e.target.value);
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, editionAvailable: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -860,11 +744,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.widthIn}
                       onChange={(e) => {
                         const v = Number(e.target.value);
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, widthIn: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -876,11 +760,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                       value={art.heightIn}
                       onChange={(e) => {
                         const v = Number(e.target.value);
-                        setArtworks((prev) =>
+                        dispatch({ type: "artworks", fn: (prev) =>
                           prev.map((a, j) =>
                             j === i ? { ...a, heightIn: v } : a,
                           ),
-                        );
+                        });
                       }}
                     />
                   </div>
@@ -890,11 +774,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                     label="Image URL"
                     value={art.imageSrc}
                     onChange={(url) => {
-                      setArtworks((prev) =>
+                      dispatch({ type: "artworks", fn: (prev) =>
                         prev.map((a, j) =>
                           j === i ? { ...a, imageSrc: url } : a,
                         ),
-                      );
+                      });
                     }}
                   />
                   </div>
@@ -904,11 +788,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                     label="Thumbnail URL"
                     value={art.thumbSrc}
                     onChange={(url) => {
-                      setArtworks((prev) =>
+                      dispatch({ type: "artworks", fn: (prev) =>
                         prev.map((a, j) =>
                           j === i ? { ...a, thumbSrc: url } : a,
                         ),
-                      );
+                      });
                     }}
                   />
                   </div>
@@ -929,7 +813,7 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
             id="about-img"
             label="Portrait image"
             value={aboutImg}
-            onChange={setAboutImg}
+            onChange={(url) => dispatch({ type: "aboutImg", value: url })}
           />
           <div className="space-y-12">
             {aboutSections.map((sec, i) => (
@@ -941,11 +825,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                     value={sec.heading}
                     onChange={(e) => {
                       const v = e.target.value;
-                      setAboutSections((prev) =>
+                      dispatch({ type: "aboutSections", fn: (prev) =>
                         prev.map((s, j) =>
                           j === i ? { ...s, heading: v } : s,
                         ),
-                      );
+                      });
                     }}
                   />
                 </div>
@@ -962,11 +846,11 @@ export function AdminDashboard({ initial }: { initial: ApiLoad }) {
                         .split(/\n\s*\n/)
                         .map((p) => p.trim())
                         .filter(Boolean);
-                      setAboutSections((prev) =>
+                      dispatch({ type: "aboutSections", fn: (prev) =>
                         prev.map((s, j) =>
                           j === i ? { ...s, paragraphs: paras } : s,
                         ),
-                      );
+                      });
                     }}
                   />
                 </div>

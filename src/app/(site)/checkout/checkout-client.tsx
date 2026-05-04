@@ -6,10 +6,10 @@ import { useMemo, useState } from "react";
 import {
   resolveCartArtworks,
   useCart,
-} from "@/components/cart/cart-context";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/Cart/CartContext";
+import { Button } from "@/components/Ui/Button";
+import { Input } from "@/components/Ui/Input";
+import { Label } from "@/components/Ui/Label";
 
 function formatMoneyUsd(cents: number) {
   return (cents / 100).toLocaleString("en-US", {

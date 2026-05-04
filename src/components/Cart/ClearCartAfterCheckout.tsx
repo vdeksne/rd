@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useCart } from "@/components/cart/cart-context";
+import { useCart } from "@/components/Cart/CartContext";
 
 /** Clears persisted cart when returning from Stripe Checkout (`session_id` in URL). */
 export function ClearCartAfterCheckout({ sessionId }: { sessionId?: string }) {

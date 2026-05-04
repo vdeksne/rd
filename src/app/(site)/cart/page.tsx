@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Ui/Button";
 import {
   resolveCartArtworks,
   useCart,
-} from "@/components/cart/cart-context";
+} from "@/components/Cart/CartContext";
 
 function formatMoneyEur(cents: number) {
   return (cents / 100).toLocaleString("de-DE", {

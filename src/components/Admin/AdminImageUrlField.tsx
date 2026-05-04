@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/Ui/Button";
+import { Label } from "@/components/Ui/Label";
 import { cn } from "@/lib/utils";
 import { useCallback, useId, useRef, useState } from "react";
 

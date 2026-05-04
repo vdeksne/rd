@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ClearCartAfterCheckout } from "@/components/cart/clear-cart-after-checkout";
+import { ClearCartAfterCheckout } from "@/components/Cart/ClearCartAfterCheckout";
 import { getStripe } from "@/lib/stripe";
 
 export const metadata = { title: "Thank you" };

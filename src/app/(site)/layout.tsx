@@ -1,6 +1,6 @@
-import { CartProvider } from "@/components/cart/cart-context";
-import { SiteChrome } from "@/components/site/site-chrome";
-import { SiteMediaShield } from "@/components/site/site-media-shield";
+import { CartProvider } from "@/components/Cart/CartContext";
+import { SiteChrome } from "@/components/Site/SiteChrome";
+import { SiteMediaShield } from "@/components/Site/SiteMediaShield";
 import { getMergedArtworks, getMergedPrimaryNav } from "@/lib/site-content";
 import "../neue-haas-font-face.css";
 

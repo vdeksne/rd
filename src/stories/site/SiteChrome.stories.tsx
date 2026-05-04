@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { CartProvider } from "@/components/cart/cart-context";
-import { SiteChrome } from "@/components/site/site-chrome";
+import { CartProvider } from "@/components/Cart/CartContext";
+import { SiteChrome } from "@/components/Site/SiteChrome";
 import { demoArtworks } from "@/lib/demo-content";
 import { SITE_PRIMARY_NAV } from "@/lib/site-nav";
 

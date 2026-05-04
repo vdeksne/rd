@@ -1,0 +1,1 @@
+export { CurateArtworkVisuals } from "./CurateArtworkVisuals";

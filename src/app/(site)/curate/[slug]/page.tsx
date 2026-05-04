@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AddToCart } from "@/components/cart/add-to-cart";
-import { CurateArtworkVisuals } from "@/components/curate/curate-artwork-visuals";
+import { AddToCart } from "@/components/Cart/AddToCart";
+import { CurateArtworkVisuals } from "@/components/Curate/CurateArtworkVisuals";
 import { getMergedArtwork } from "@/lib/site-content";
 
 type Props = { params: Promise<{ slug: string }> };

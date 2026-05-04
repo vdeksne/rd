@@ -1,4 +1,4 @@
-import { AdminDashboard } from "./admin-dashboard";
+import { AdminDashboard } from "@/components/AdminDashboard/AdminDashboard";
 import { loadSiteOverrides } from "@/lib/site-content";
 import { getSiteEditorDefaults } from "@/lib/site-editor-defaults";
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/components/cart/cart-context";
+import { Button } from "@/components/Ui/Button";
+import { useCart } from "@/components/Cart/CartContext";
 
 export function AddToCart({ slug }: { slug: string }) {
   const { add } = useCart();

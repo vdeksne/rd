@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { CartIcon } from "@/components/icons/cart-icon";
-import { SiteMobileChromeNav } from "@/components/site/site-mobile-chrome-nav";
+import { CartIcon } from "@/components/Icons/CartIcon";
+import { SiteMobileChromeNav } from "@/components/Site/SiteMobileChromeNav";
 import type { SiteNavItem } from "@/lib/site-nav";
 import { cn } from "@/lib/utils";
 
