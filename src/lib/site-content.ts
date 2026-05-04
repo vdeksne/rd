@@ -16,6 +16,10 @@ import {
   isBlobOverridesConfigured,
   readSiteOverridesFromBlobIfConfigured,
 } from "@/lib/site-overrides-blob";
+import {
+  coerceLayoutSpacingInput,
+  type LayoutSpacing,
+} from "@/lib/site-layout-spacing";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
 /**
@@ -85,12 +89,40 @@ export async function getMergedHomeHero() {
   if (shouldStripLocalAdminUpload(merged.imageSrc)) {
     merged.imageSrc = homeHero.imageSrc;
   }
+  const mob = merged.imageSrcMobile?.trim();
+  if (mob && shouldStripLocalAdminUpload(mob)) {
+    delete merged.imageSrcMobile;
+  }
   return merged;
 }
 
 export async function getMergedHomeHeroFrame() {
   const o = await loadSiteOverrides();
   return { ...homeHeroFrame, ...o.homeHeroFrame };
+}
+
+function clampFinite(n: number, min: number, max: number): number {
+  if (!Number.isFinite(n)) return min;
+  return Math.min(max, Math.max(min, n));
+}
+
+export async function getMergedLayoutSpacing(): Promise<LayoutSpacing> {
+  const o = await loadSiteOverrides();
+  const c = coerceLayoutSpacingInput(o.layoutSpacing);
+  return {
+    mainGutterMaxPx: clampFinite(c.mainGutterMaxPx, 16, 160),
+    sectionPadBottomPx: clampFinite(c.sectionPadBottomPx, 24, 320),
+    detailGapMaxPx: clampFinite(c.detailGapMaxPx, 16, 160),
+    curateIndexGutterMinPx: clampFinite(c.curateIndexGutterMinPx, 8, 64),
+    siteRailMaxRem: clampFinite(c.siteRailMaxRem, 14, 26),
+    homeCaptionBelowMaxPx: clampFinite(c.homeCaptionBelowMaxPx, 4, 48),
+    checkoutFormPyMaxPx: clampFinite(c.checkoutFormPyMaxPx, 48, 200),
+    checkoutEmptyPyMaxPx: clampFinite(c.checkoutEmptyPyMaxPx, 64, 280),
+    gridGapXPx: clampFinite(c.gridGapXPx, 4, 48),
+    gridGapYSmPx: clampFinite(c.gridGapYSmPx, 4, 40),
+    gridGapYLgPx: clampFinite(c.gridGapYLgPx, 8, 56),
+    legalPagePyPx: clampFinite(c.legalPagePyPx, 48, 200),
+  };
 }
 
 export async function getMergedPortfolioSlides(): Promise<PortfolioSlide[]> {

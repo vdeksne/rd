@@ -31,7 +31,7 @@ export default function CartPage() {
 
   return (
     <main className="relative min-h-screen bg-white max-[1684px]:pb-10 max-[1684px]:pt-0 min-[1685px]:pb-[var(--gallery-section-pad-bottom)] min-[1685px]:pt-(--home-hero-top)">
-      <div className="mx-auto w-full max-w-[var(--gallery-max-content)] px-[var(--gallery-gutter-x)] sm:px-[clamp(1.25rem,4vw,2.5rem)]">
+      <div className="mx-auto w-full max-w-[var(--gallery-max-content)] px-[var(--gallery-gutter-x)]">
         <h1 className="type-gallery-page-title text-neutral-600">
           Shopping Cart
         </h1>

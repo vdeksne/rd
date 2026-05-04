@@ -7,6 +7,10 @@ import {
   portfolioDefaultSlideIndex,
   portfolioSlides,
 } from "@/lib/demo-content";
+import {
+  layoutSpacingDefaults,
+  type LayoutSpacing,
+} from "@/lib/site-layout-spacing";
 import { SITE_PRIMARY_NAV } from "@/lib/site-nav";
 
 /** Payload shape shared by `/api/admin/overrides` GET and the admin page bootstrap. */
@@ -21,6 +25,7 @@ export type SiteEditorDefaults = {
     imageSrc: string;
     sections: { heading: string; paragraphs: string[] }[];
   };
+  layoutSpacing: LayoutSpacing;
 };
 
 export function getSiteEditorDefaults(): SiteEditorDefaults {
@@ -41,5 +46,6 @@ export function getSiteEditorDefaults(): SiteEditorDefaults {
         paragraphs: [...s.paragraphs],
       })),
     },
+    layoutSpacing: { ...layoutSpacingDefaults },
   };
 }

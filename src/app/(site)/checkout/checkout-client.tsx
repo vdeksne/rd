@@ -113,7 +113,7 @@ export function CheckoutClient() {
 
   if (resolved.length === 0) {
     return (
-      <div className="mx-auto max-w-xl px-[var(--gallery-gutter-x)] py-[clamp(4rem,12vw,8rem)]">
+      <div className="mx-auto max-w-xl px-[var(--gallery-gutter-x)] py-[var(--checkout-empty-py)]">
         <p className="type-gallery-body text-neutral-600">
           Nothing to check out.{" "}
           <Link href="/curate" className="hover:text-neutral-900">
@@ -126,7 +126,7 @@ export function CheckoutClient() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[440px] flex-col px-[var(--gallery-gutter-x)] py-[clamp(3rem,8vw,5rem)] sm:px-0 sm:py-16">
+    <div className="mx-auto flex w-full max-w-[440px] flex-col px-[var(--gallery-gutter-x)] py-[var(--checkout-form-py)] sm:px-0 sm:py-16">
       <div className="border border-[#e0e0e0] bg-white px-5 pb-8 pt-7 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:px-6 sm:pt-8">
         <h2 className="type-gallery-ui-heading text-neutral-950">
           Order Summary

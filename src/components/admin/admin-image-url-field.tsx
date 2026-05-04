@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { useCallback, useId, useRef, useState } from "react";
 
 type Props = {
@@ -10,9 +10,11 @@ type Props = {
   label: string;
   value: string;
   onChange: (next: string) => void;
-  /** Hint under the URL field */
   hint?: string;
   showPreview?: boolean;
+  previewSize?: "default" | "hero";
+  /** Show “Remove” when there is an image (e.g. optional mobile hero). */
+  allowClear?: boolean;
 };
 
 export function AdminImageUrlField({
@@ -22,12 +24,15 @@ export function AdminImageUrlField({
   onChange,
   hint,
   showPreview = true,
+  previewSize = "default",
+  allowClear = false,
 }: Props) {
   const autoId = useId();
-  const id = idProp ?? `img-url-${autoId}`;
+  const id = idProp ?? `img-upload-${autoId}`;
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [previewBroken, setPreviewBroken] = useState(false);
 
   const pickFile = useCallback(() => {
     fileRef.current?.click();
@@ -54,7 +59,9 @@ export function AdminImageUrlField({
         };
         if (!res.ok) {
           throw new Error(
-            typeof data.error === "string" ? data.error : `Upload failed (${res.status})`,
+            typeof data.error === "string"
+              ? data.error
+              : `Upload failed (${res.status})`,
           );
         }
         if (
@@ -63,6 +70,7 @@ export function AdminImageUrlField({
         ) {
           throw new Error("Invalid upload response");
         }
+        setPreviewBroken(false);
         onChange(data.url);
       } catch (err) {
         setUploadError(err instanceof Error ? err.message : "Upload failed");
@@ -73,19 +81,43 @@ export function AdminImageUrlField({
     [onChange],
   );
 
+  const trimmed = value.trim();
+  const showFrame = showPreview && Boolean(trimmed);
+
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-3">
       <Label htmlFor={id}>{label}</Label>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-        <Input
-          id={id}
-          className="min-w-0 flex-1 font-mono text-xs"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="/images/… or https://…"
-        />
+
+      {showFrame ? (
+        <div
+          className={cn(
+            "relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-black/6",
+            previewSize === "hero"
+              ? "aspect-1202/801 max-h-[min(420px,52vh)]"
+              : "aspect-3/2 max-h-[min(280px,38vh)] sm:max-h-[min(320px,42vh)]",
+          )}
+        >
+          {!previewBroken ? (
+            /* eslint-disable-next-line @next/next/no-img-element -- admin preview; arbitrary URLs */
+            <img
+              src={trimmed}
+              alt=""
+              className="max-h-full max-w-full object-contain"
+              onError={() => setPreviewBroken(true)}
+              onLoad={() => setPreviewBroken(false)}
+            />
+          ) : (
+            <p className="max-w-[18rem] px-4 text-center text-[13px] leading-snug text-neutral-500">
+              Preview unavailable — try uploading again.
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-2">
         <input
           ref={fileRef}
+          id={id}
           type="file"
           accept="image/jpeg,image/png,image/webp,image/gif"
           className="sr-only"
@@ -96,26 +128,33 @@ export function AdminImageUrlField({
           type="button"
           variant="outline"
           size="default"
-          className="shrink-0 sm:w-[7.5rem]"
+          className="rounded-lg border-neutral-200 bg-white text-[13px] font-normal shadow-none hover:bg-neutral-50"
           disabled={uploading}
           onClick={pickFile}
         >
           {uploading ? "Uploading…" : "Upload"}
         </Button>
+        {allowClear && trimmed ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="default"
+            className="text-[13px] font-normal text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+            disabled={uploading}
+            onClick={() => {
+              setPreviewBroken(false);
+              onChange("");
+            }}
+          >
+            Remove
+          </Button>
+        ) : null}
       </div>
-      {hint ? <p className="text-[11px] text-neutral-500">{hint}</p> : null}
-      {uploadError ? (
-        <p className="text-xs text-red-600">{uploadError}</p>
+      {hint ? (
+        <p className="text-[12px] leading-relaxed text-neutral-500">{hint}</p>
       ) : null}
-      {showPreview && value.trim() ? (
-        <div className="mt-2 overflow-hidden rounded-md border border-neutral-200 bg-neutral-50 p-2">
-          {/* eslint-disable-next-line @next/next/no-img-element -- admin preview; arbitrary URLs */}
-          <img
-            src={value}
-            alt=""
-            className="mx-auto max-h-40 w-auto max-w-full object-contain"
-          />
-        </div>
+      {uploadError ? (
+        <p className="text-[13px] text-red-600">{uploadError}</p>
       ) : null}
     </div>
   );

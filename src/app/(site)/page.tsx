@@ -4,13 +4,26 @@ import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { getMergedHomeHero, getMergedHomeHeroFrame } from "@/lib/site-content";
 
-const heroSizes =
-  "(max-width: 639px) calc(100vw - 2 * var(--gallery-gutter-x)), (max-width: 1684px) calc(100vw - 2 * var(--gallery-gutter-x)), calc(100vw - var(--site-rail) - 2 * var(--gallery-gutter-x))";
+const heroSizesSingle =
+  "(max-width: 1684px) 100vw, min(1202px, 90vw)";
+
+/** Hidden desktop duplicate must use a non-trivial slot so the optimizer never picks a ~16px derivative. */
+const heroSizesMobileOnly =
+  "(max-width: 1684px) 100vw, 48px";
+
+const heroSizesDesktopOnly =
+  "(max-width: 1684px) 48px, min(1202px, 90vw)";
 
 export default async function HomePage() {
   const homeHero = await getMergedHomeHero();
   const homeHeroFrame = await getMergedHomeHeroFrame();
   const { widthPx, heightPx } = homeHeroFrame;
+
+  const desktopSrc = homeHero.imageSrc;
+  const mobileOverride = homeHero.imageSrcMobile?.trim();
+  const mobileSrc = mobileOverride || desktopSrc;
+  const splitMobileHero =
+    Boolean(mobileOverride) && mobileSrc !== desktopSrc;
 
   return (
     <main className="relative flex w-full min-w-0 flex-col items-center bg-white max-[1684px]:pt-0 min-[1685px]:pt-(--home-hero-top)">
@@ -28,19 +41,45 @@ export default async function HomePage() {
               } as CSSProperties
             }
           >
-            <Image
-              src={homeHero.imageSrc}
-              alt=""
-              fill
-              sizes={heroSizes}
-              className="object-cover object-center"
-              loading="eager"
-              fetchPriority="high"
-            />
+            {splitMobileHero ? (
+              <>
+                <Image
+                  src={mobileSrc}
+                  alt=""
+                  fill
+                  sizes={heroSizesMobileOnly}
+                  quality={92}
+                  className="object-cover object-center min-[1685px]:hidden"
+                  loading="eager"
+                  fetchPriority="high"
+                />
+                <Image
+                  src={desktopSrc}
+                  alt=""
+                  fill
+                  sizes={heroSizesDesktopOnly}
+                  quality={92}
+                  className="hidden object-cover object-center min-[1685px]:block"
+                  loading="eager"
+                  fetchPriority="high"
+                />
+              </>
+            ) : (
+              <Image
+                src={desktopSrc}
+                alt=""
+                fill
+                sizes={heroSizesSingle}
+                quality={92}
+                className="object-cover object-center"
+                loading="eager"
+                fetchPriority="high"
+              />
+            )}
           </div>
         </div>
       </div>
-      <div className="mt-[clamp(0.375rem,1.5vw,0.75rem)] flex w-full justify-center px-[var(--gallery-gutter-x)]">
+      <div className="mt-[var(--home-caption-mt)] flex w-full justify-center px-[var(--gallery-gutter-x)]">
         <p className="type-gallery-caption w-full min-w-0 max-w-[var(--gallery-max-content)] text-neutral-700">
           <span>{homeHero.captionBefore}</span>
           <Link

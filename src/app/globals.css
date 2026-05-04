@@ -112,6 +112,11 @@
   --gallery-grid-gap-x: 0.625rem; /* 10px */
   --gallery-grid-gap-y-sm: 0.5rem;
   --gallery-grid-gap-y-lg: 1.375rem;
+
+  --home-caption-mt: clamp(6px, 1.5vw, 12px);
+  --checkout-form-py: clamp(3rem, 8vw, 80px);
+  --checkout-empty-py: clamp(4rem, 12vw, 128px);
+  --legal-page-py: 96px;
 }
 
 .dark {
@@ -172,6 +177,15 @@
     -moz-user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+  }
+
+  /* Admin UI — compact field labels */
+  .admin-scope [data-slot="label"] {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
   }
 
   /* Figma Raivis_WebDev — sidebar title (node 112-901 area) */

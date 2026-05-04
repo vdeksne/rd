@@ -99,9 +99,24 @@ export async function PUT(req: Request) {
     }
   }
 
-  /* Homepage and nested layouts consume overrides via noStore(); still poke cache on save. */
+  /* Pages read overrides via noStore(); refresh root layout + primary routes after save. */
   revalidatePath("/");
   revalidatePath("/", "layout");
+
+  const paths = [
+    "/portfolio",
+    "/curate",
+    "/about",
+    "/cart",
+    "/checkout",
+    "/checkout/success",
+    "/legal/terms",
+    "/legal/returns",
+  ];
+  for (const p of paths) {
+    revalidatePath(p);
+    revalidatePath(p, "layout");
+  }
 
   return NextResponse.json({ ok: true });
 }

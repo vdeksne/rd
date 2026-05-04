@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import type { CSSProperties } from "react";
 import "./globals.css";
-import { getMergedHomeHeroFrame } from "@/lib/site-content";
+import {
+  getMergedHomeHeroFrame,
+  getMergedLayoutSpacing,
+} from "@/lib/site-content";
+import type { LayoutSpacing } from "@/lib/site-layout-spacing";
 
 const siteDescription =
   "Curated fine-art photography and editions. E-commerce experience for collectors.";
@@ -31,6 +34,29 @@ function resolveMetadataBase(): URL {
 }
 
 const metadataBase = resolveMetadataBase();
+
+/**
+ * Overrides must beat `:root` tokens from `globals.css`. Inline `style` on `<html>` is not reliable
+ * with the App Router / hydration path here; a late `<style>` block keeps spacing editor changes visible.
+ */
+function siteThemeCss(heroTopPx: number, spacing: LayoutSpacing): string {
+  const top = Number.isFinite(heroTopPx) ? heroTopPx : 116;
+  return `:root {
+  --home-hero-top: ${top}px;
+  --gallery-gutter-x: clamp(1rem, 4vw, ${spacing.mainGutterMaxPx}px);
+  --gallery-section-pad-bottom: ${spacing.sectionPadBottomPx}px;
+  --gallery-detail-gap: clamp(1.5rem, 4vw, ${spacing.detailGapMaxPx}px);
+  --gallery-gutter-index: max(${spacing.curateIndexGutterMinPx}px, 2.25vw);
+  --site-rail: clamp(14rem, calc(11vw + 6.5rem), ${spacing.siteRailMaxRem}rem);
+  --home-caption-mt: clamp(6px, 1.5vw, ${spacing.homeCaptionBelowMaxPx}px);
+  --checkout-form-py: clamp(3rem, 8vw, ${spacing.checkoutFormPyMaxPx}px);
+  --checkout-empty-py: clamp(4rem, 12vw, ${spacing.checkoutEmptyPyMaxPx}px);
+  --gallery-grid-gap-x: ${spacing.gridGapXPx}px;
+  --gallery-grid-gap-y-sm: ${spacing.gridGapYSmPx}px;
+  --gallery-grid-gap-y-lg: ${spacing.gridGapYLgPx}px;
+  --legal-page-py: ${spacing.legalPagePyPx}px;
+}`;
+}
 
 /** Root reads hero frame CSS vars from Blob/overrides — must stay dynamic when Blob-linked. */
 export const dynamic = "force-dynamic";
@@ -64,14 +90,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { topPaddingDesktopPx } = await getMergedHomeHeroFrame();
-  const htmlStyle = {
-    "--home-hero-top": `${topPaddingDesktopPx}px`,
-  } as CSSProperties;
+  const [heroFrame, spacing] = await Promise.all([
+    getMergedHomeHeroFrame(),
+    getMergedLayoutSpacing(),
+  ]);
+  const { topPaddingDesktopPx } = heroFrame;
 
   return (
-    <html lang="en" className="h-full antialiased" style={htmlStyle}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+    <html lang="en" className="h-full antialiased">
+      <body className="min-h-full flex flex-col font-sans">
+        <style dangerouslySetInnerHTML={{ __html: siteThemeCss(topPaddingDesktopPx, spacing) }} />
+        {children}
+      </body>
     </html>
   );
 }

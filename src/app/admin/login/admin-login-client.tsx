@@ -38,20 +38,19 @@ export function AdminLoginClient() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
-      <div className="rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
-        <h1 className="type-site-display text-center text-sm font-semibold tracking-widest uppercase">
-          Admin sign-in
-        </h1>
-        <p className="mt-2 text-center text-xs font-light text-neutral-600">
-          Use the password from{" "}
-          <code className="rounded bg-neutral-100 px-1 py-0.5 text-[10px]">
-            ADMIN_PASSWORD
-          </code>
-          .
-        </p>
-        <form className="mt-8 space-y-4" onSubmit={(e) => void onSubmit(e)}>
-          <div className="space-y-1.5">
+    <div className="admin-scope flex min-h-[85vh] flex-col justify-center px-6 py-16">
+      <div className="mx-auto w-full max-w-[380px] space-y-10">
+        <div className="space-y-2 text-center">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
+            Raivis Deutschman
+          </p>
+          <h1 className="text-2xl font-light tracking-tight text-neutral-950">
+            Sign in
+          </h1>
+        </div>
+
+        <form className="space-y-6" onSubmit={(e) => void onSubmit(e)}>
+          <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
@@ -61,15 +60,20 @@ export function AdminLoginClient() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="h-11 rounded-lg"
             />
           </div>
           {error ? (
-            <p className="text-xs text-red-600" role="alert">
+            <p className="text-[13px] text-red-600" role="alert">
               {error}
             </p>
           ) : null}
-          <Button type="submit" className="w-full" disabled={busy}>
-            {busy ? "Signing in…" : "Sign in"}
+          <Button
+            type="submit"
+            className="h-11 w-full rounded-lg bg-neutral-900 font-normal text-white shadow-none hover:bg-neutral-800"
+            disabled={busy}
+          >
+            {busy ? "Signing in…" : "Continue"}
           </Button>
         </form>
       </div>

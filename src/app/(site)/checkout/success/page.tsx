@@ -79,7 +79,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen bg-white max-[1684px]:pt-0 min-[1685px]:pt-(--home-hero-top)">
       <ClearCartAfterCheckout sessionId={sessionId} />
-      <div className="mx-auto flex w-full max-w-[440px] flex-col px-[var(--gallery-gutter-x)] py-[clamp(3rem,8vw,5rem)] sm:px-0 sm:py-16">
+      <div className="mx-auto flex w-full max-w-[440px] flex-col px-[var(--gallery-gutter-x)] py-[var(--checkout-form-py)] sm:px-0 sm:py-16">
         <div className="border border-[#e0e0e0] bg-white px-5 pb-10 pt-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:px-8 sm:pb-12 sm:pt-12">
           <div className="flex flex-col items-center text-center">
             <SuccessCheckIcon className="h-14 w-14 shrink-0 text-emerald-700" />

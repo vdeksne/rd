@@ -191,7 +191,6 @@ export function PortfolioGallery({
       >
         {multi && reducedMotion ? (
           <Image
-            key={current.id}
             src={portfolioSlideSrc(current, 1600)}
             alt=""
             fill
@@ -202,27 +201,25 @@ export function PortfolioGallery({
           />
         ) : multi ? (
           <div className="absolute inset-0">
+            {/* Bottom: previous slide stays fully opaque — avoids grey flash between layers */}
             <Image
               src={portfolioSlideSrc(slides[crossfade.from]!, 1600)}
               alt=""
               fill
-              className={cn(
-                "object-cover ease-in-out motion-safe:transition-opacity",
-                crossfadeDurationClass,
-                crossfade.reveal ? "z-0 opacity-0" : "z-10 opacity-100",
-              )}
+              className="pointer-events-none z-0 object-cover"
               sizes="(max-width: 768px) 100vw, min(1202px, 90vw)"
               priority={crossfade.from === boundedInitial}
               draggable={false}
             />
+            {/* Top: incoming slide fades in over the outgoing image */}
             <Image
               src={portfolioSlideSrc(slides[crossfade.to]!, 1600)}
               alt=""
               fill
               className={cn(
-                "object-cover ease-in-out motion-safe:transition-opacity",
+                "pointer-events-none z-10 object-cover ease-in-out motion-safe:transition-opacity",
                 crossfadeDurationClass,
-                crossfade.reveal ? "z-10 opacity-100" : "z-0 opacity-0",
+                crossfade.reveal ? "opacity-100" : "opacity-0",
               )}
               sizes="(max-width: 768px) 100vw, min(1202px, 90vw)"
               priority={crossfade.to === boundedInitial}
@@ -231,7 +228,6 @@ export function PortfolioGallery({
           </div>
         ) : (
           <Image
-            key={current.id}
             src={portfolioSlideSrc(current, 1600)}
             alt=""
             fill

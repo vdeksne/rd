@@ -9,7 +9,7 @@ export default async function AdminHomePage() {
   const defaults = getSiteEditorDefaults();
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-6xl px-5 pb-28 pt-8 sm:px-8 lg:max-w-7xl lg:px-12 lg:pt-10">
       <AdminDashboard
         key={JSON.stringify(overrides)}
         initial={{ overrides, defaults }}
