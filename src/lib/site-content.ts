@@ -18,6 +18,15 @@ import {
 } from "@/lib/site-overrides-blob";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
+/**
+ * Uploads without Vercel Blob write to `public/images/admin-uploads/` locally; those files are
+ * gitignored and absent from serverless deployments, so the same path 404s on Vercel.
+ */
+function shouldStripLocalAdminUpload(url: string | undefined): boolean {
+  const u = url?.trim() ?? "";
+  return u.startsWith("/images/admin-uploads/") && process.env.VERCEL === "1";
+}
+
 function readSiteOverridesFromDisk(): SiteOverrides {
   try {
     const filePath = path.join(process.cwd(), "data", "site-overrides.json");
@@ -72,7 +81,11 @@ export async function getMergedPrimaryNav(): Promise<{ href: string; label: stri
 
 export async function getMergedHomeHero() {
   const o = await loadSiteOverrides();
-  return { ...homeHero, ...o.homeHero };
+  const merged = { ...homeHero, ...o.homeHero };
+  if (shouldStripLocalAdminUpload(merged.imageSrc)) {
+    merged.imageSrc = homeHero.imageSrc;
+  }
+  return merged;
 }
 
 export async function getMergedHomeHeroFrame() {
@@ -83,8 +96,19 @@ export async function getMergedHomeHeroFrame() {
 export async function getMergedPortfolioSlides(): Promise<PortfolioSlide[]> {
   const o = await loadSiteOverrides();
   const next = o.portfolioSlides;
-  if (next?.length) return next;
-  return portfolioSlides;
+  if (!next?.length) return portfolioSlides;
+  return next.map((slide, i) => {
+    if (!shouldStripLocalAdminUpload(slide.imageSrc)) return slide;
+    const def =
+      portfolioSlides.find((s) => s.id === slide.id) ??
+      portfolioSlides[i] ??
+      portfolioSlides[0];
+    return {
+      ...slide,
+      imageSrc: def?.imageSrc,
+      photoId: slide.photoId ?? def?.photoId,
+    };
+  });
 }
 
 export async function getMergedPortfolioDefaultSlideIndex(): Promise<number> {
@@ -97,8 +121,20 @@ export async function getMergedPortfolioDefaultSlideIndex(): Promise<number> {
 export async function getMergedArtworks(): Promise<Artwork[]> {
   const o = await loadSiteOverrides();
   const next = o.artworks;
-  if (next?.length) return next;
-  return demoArtworks;
+  if (!next?.length) return demoArtworks;
+  const fallbackArt = demoArtworks[0]!;
+  return next.map((a) => {
+    const def = demoArtworks.find((d) => d.slug === a.slug);
+    let imageSrc = a.imageSrc;
+    let thumbSrc = a.thumbSrc;
+    if (shouldStripLocalAdminUpload(imageSrc)) {
+      imageSrc = def?.imageSrc ?? fallbackArt.imageSrc;
+    }
+    if (shouldStripLocalAdminUpload(thumbSrc)) {
+      thumbSrc = def?.thumbSrc ?? fallbackArt.thumbSrc;
+    }
+    return { ...a, imageSrc, thumbSrc };
+  });
 }
 
 export async function getMergedArtwork(slug: string): Promise<Artwork | null> {
@@ -110,8 +146,11 @@ export async function getMergedAboutContent() {
   const o = await loadSiteOverrides();
   const merged = o.aboutContent;
   if (!merged) return aboutContent;
+  const imageSrc = merged.imageSrc ?? aboutContent.imageSrc;
   return {
-    imageSrc: merged.imageSrc ?? aboutContent.imageSrc,
+    imageSrc: shouldStripLocalAdminUpload(imageSrc)
+      ? aboutContent.imageSrc
+      : imageSrc,
     sections: merged.sections ?? aboutContent.sections,
   };
 }
