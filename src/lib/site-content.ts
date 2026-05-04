@@ -12,7 +12,10 @@ import {
   type PortfolioSlide,
 } from "@/lib/demo-content";
 import { SITE_PRIMARY_NAV } from "@/lib/site-nav";
-import { readSiteOverridesFromBlobIfConfigured } from "@/lib/site-overrides-blob";
+import {
+  isBlobOverridesConfigured,
+  readSiteOverridesFromBlobIfConfigured,
+} from "@/lib/site-overrides-blob";
 import type { SiteOverrides } from "@/lib/site-overrides-types";
 
 function readSiteOverridesFromDisk(): SiteOverrides {
@@ -32,12 +35,22 @@ function readSiteOverridesFromDisk(): SiteOverrides {
 
 /**
  * Resolves overrides: Blob (`BLOB_READ_WRITE_TOKEN`), else `data/site-overrides.json`.
- * When Blob is configured, repo JSON on disk must **not** override Blob (fixes “admin saved but site unchanged”).
+ * When Blob is configured, the live payload normally comes from Blob. If the read fails (bad token,
+ * network, etc.), we fall back to disk so pages still render; check logs for
+ * `[site-content] Blob overrides unavailable`.
  */
 export async function resolveSiteOverrides(): Promise<SiteOverrides> {
-  const fromBlob = await readSiteOverridesFromBlobIfConfigured();
-  if (fromBlob !== null) {
-    return fromBlob;
+  if (!isBlobOverridesConfigured()) {
+    return readSiteOverridesFromDisk();
+  }
+  try {
+    const fromBlob = await readSiteOverridesFromBlobIfConfigured();
+    if (fromBlob !== null) return fromBlob;
+  } catch (e) {
+    console.error(
+      "[site-content] Blob overrides unavailable; falling back to data/site-overrides.json.",
+      e,
+    );
   }
   return readSiteOverridesFromDisk();
 }
