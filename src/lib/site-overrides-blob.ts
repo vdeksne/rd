@@ -37,6 +37,25 @@ function parseOverrides(raw: string): SiteOverrides | null {
   return null;
 }
 
+/** Same as @vercel/blob `get()` — fourth `_`-segment in `vercel_blob_rw_{storeId}_…`. */
+function storeIdFromBlobReadWriteToken(token: string): string | undefined {
+  const [, , , storeId = ""] = token.split("_");
+  return storeId || undefined;
+}
+
+/**
+ * Public blobs are readable without `Authorization` (browser-style). The SDK `get()` path sends
+ * Bearer to `*.public.blob.vercel-storage.com`, which can return 400 while `put()` via api/blob
+ * still succeeds — so we fetch the public URL directly first.
+ */
+async function fetchPublicSiteOverridesBody(
+  pathname: string,
+  storeId: string,
+): Promise<Response> {
+  const url = `https://${storeId}.public.blob.vercel-storage.com/${pathname}`;
+  return fetch(url, { cache: "no-store" });
+}
+
 /**
  * Reads overrides when `BLOB_READ_WRITE_TOKEN` exists.
  *
@@ -54,21 +73,45 @@ export async function readSiteOverridesFromBlobIfConfigured(): Promise<SiteOverr
   const token = blobToken();
   if (!token) return null;
 
+  const storeId = storeIdFromBlobReadWriteToken(token);
+
+  if (storeId) {
+    try {
+      const res = await fetchPublicSiteOverridesBody(
+        SITE_OVERRIDES_BLOB_PATH,
+        storeId,
+      );
+      if (res.status === 404) {
+        return {};
+      }
+      if (res.ok) {
+        const text = await res.text();
+        const parsed = parseOverrides(text);
+        return parsed ?? {};
+      }
+      console.warn(
+        "[site-overrides-blob] public URL read status",
+        res.status,
+        res.statusText,
+      );
+    } catch (e) {
+      console.warn("[site-overrides-blob] public URL read failed, trying SDK", e);
+    }
+  }
+
   try {
-    /* Default CDN fetch — useCache:false adds ?cache=0 which can 400 on public blobs in some cases */
     const result = await get(SITE_OVERRIDES_BLOB_PATH, {
       access: "public",
       token,
     });
 
-    /* SDK returns `null` for HTTP 404. */
     if (result === null) {
       return {};
     }
 
     if (result.statusCode !== 200 || !result.stream) {
       console.warn(
-        "[site-overrides-blob] unexpected GET response:",
+        "[site-overrides-blob] unexpected SDK GET response:",
         result?.statusCode,
       );
       return {};
